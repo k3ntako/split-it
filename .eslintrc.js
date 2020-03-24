@@ -1,7 +1,8 @@
 module.exports = {
   env: {
     browser: true,
-    es6: true
+    es6: true,
+    mocha: true
   },
   extends: [
     'standard',
@@ -21,5 +22,6 @@ module.exports = {
     '@typescript-eslint'
   ],
   rules: {
+    "interface-name": [true, "never-prefix"]
   }
 }
