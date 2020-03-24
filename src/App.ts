@@ -1,7 +1,6 @@
 import IMain from './IMain';
 import IApp from './IApp';
 
-
 export default class App implements IApp {
   main: IMain;
 

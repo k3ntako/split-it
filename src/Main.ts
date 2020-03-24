@@ -7,8 +7,8 @@ export default class Main {
     this.cli = cli;
   }
 
-  start(){
+  start(): void {
     this.cli.clear();
-    this.cli.print("Welcome to Split-it!");
+    this.cli.print('Welcome to Split-it!');
   }
 }

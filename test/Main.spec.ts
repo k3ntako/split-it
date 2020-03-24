@@ -1,27 +1,27 @@
-const { expect } = require('chai');
-import Main from '../src/Main'
+import { expect } from 'chai';
+import Main from '../src/Main';
 import ICLI from '../src/ICLI';
 
 class MockCLI implements ICLI {
   printArguments: string[];
   clearCallNum: number;
-  constructor(){
+  constructor() {
     this.printArguments = [];
-    this.clearCallNum = 0
+    this.clearCallNum = 0;
   }
 
-  print(message: string): void{
+  print(message: string): void {
     this.printArguments.push(message);
   }
 
-  clear(){
+  clear(): void {
     this.clearCallNum++;
   }
 }
 
 describe('welcome message', () => {
   it('should call print with welcome message', () => {
-    const mockCLI: MockCLI = new MockCLI;
+    const mockCLI: MockCLI = new MockCLI();
     const main = new Main(mockCLI);
     main.start();
 

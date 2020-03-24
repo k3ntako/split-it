@@ -6,7 +6,7 @@ class Main {
     }
     start() {
         this.cli.clear();
-        this.cli.print("Welcome to Split-it!");
+        this.cli.print('Welcome to Split-it!');
     }
 }
 exports.default = Main;
