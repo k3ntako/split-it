@@ -1,3 +1,3 @@
 export default interface IMain {
-  start(): void;
+  start(): Promise<void>;
 }

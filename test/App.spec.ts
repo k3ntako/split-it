@@ -8,8 +8,13 @@ class MockMain implements IMain {
     this.startCallNum = 0;
   }
 
-  start(): void {
+  async start(): Promise<void> {
     this.startCallNum++;
+    return Promise.resolve();
+  }
+
+  async getPerson(): Promise<void> {
+    return Promise.resolve();
   }
 }
 
