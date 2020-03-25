@@ -1,5 +1,5 @@
-import ICLI from '../../src/ICLI';
-import { Answers, Question, ListQuestionOptions } from 'inquirer';
+import { ICLI } from '../../src/CLI';
+import { Answers, Question } from 'inquirer';
 
 export default class MockCLI implements ICLI {
   printArguments: string[];

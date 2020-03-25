@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import App from '../src/App';
-import IMain from '../src/IMain';
+import { IMain } from '../src/Main';
 
 class MockMain implements IMain {
   startCallNum: number;

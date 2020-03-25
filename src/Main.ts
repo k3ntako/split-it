@@ -1,7 +1,11 @@
-import ICLI from './ICLI';
-import IPrompter from './IPrompter';
+import { ICLI } from './CLI';
+import { IPrompter } from './Prompter';
 
-export default class Main {
+export interface IMain {
+  start(): Promise<void>;
+}
+
+export default class Main implements IMain {
   cli: ICLI;
   prompter: IPrompter;
 

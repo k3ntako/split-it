@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 import Main from '../src/Main';
 import MockCLI from './mockClasses/mockCLI';
-import IPrompter from '../src/IPrompter';
-import Prompter from '../src/Prompter';
+import Prompter, { IPrompter } from '../src/Prompter';
 
 describe('Main', () => {
   describe('start', () => {

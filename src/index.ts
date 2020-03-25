@@ -1,10 +1,8 @@
 import App from './App';
 import Main from './Main';
-import CLI from './CLI';
-import ICLI from './ICLI';
-import IMain from './IMain';
-import IPrompter from './IPrompter';
-import Prompter from './Prompter';
+import CLI, { ICLI } from './CLI';
+import { IMain } from './Main';
+import Prompter, { IPrompter } from './Prompter';
 
 const cli: ICLI = new CLI();
 const prompter: IPrompter = new Prompter(cli);
