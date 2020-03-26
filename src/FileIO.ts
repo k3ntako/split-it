@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -26,17 +25,15 @@ export default class FileIO implements IFileIO{
         id: uuidv4(),
       }, data);
 
-      const tableExists = fs.existsSync(tableDir);
-      let tableStr;
-      if (!tableExists) {
-        tableStr = JSON.stringify([dataWithId]);
-      } else {
-        const dataStr: string = fs.readFileSync(tableDir, 'utf-8');
-        const tableData = JSON.parse(dataStr);
-        tableData.push(dataWithId);
-        tableStr = JSON.stringify(tableData);
-      }
+      let tableData = this.readTable(tableName);
 
+      if (!tableData) {
+        tableData = [dataWithId];
+      } else {        
+        tableData.push(dataWithId);
+      }
+      
+      const tableStr = JSON.stringify(tableData);
       fs.writeFileSync(tableDir, tableStr, { encoding: 'utf-8', flag: 'w' });
 
       return dataWithId;
@@ -46,7 +43,18 @@ export default class FileIO implements IFileIO{
   }
 
   readRow(tableName: string, id: string): {} | null {
+    const tableData: any[] = this.readTable(tableName);
+    
+    if (!tableData) {
+      return null;
+    }
+
+    return tableData.find(row => row.id === id) || null;
+  }
+
+  private readTable(tableName: string): any{
     const tableDir: string = this.dbDir + '/' + tableName + '.json';
+
     const tableExists: boolean = fs.existsSync(tableDir);
 
     if (!tableExists) {
@@ -54,8 +62,7 @@ export default class FileIO implements IFileIO{
     }
 
     const tableStr: string = fs.readFileSync(tableDir, 'utf-8');
-    const tableData: any[] = JSON.parse(tableStr);
-    return tableData.find(row => row.id === id) || null;
+    return JSON.parse(tableStr);
   }
 
   private createDirIfDoesNotExist(): void{
