@@ -1,4 +1,4 @@
-# Split-it!
+# Split-it! [![CircleCI](https://circleci.com/gh/k3ntako/split-it.svg?style=svg)](https://circleci.com/gh/k3ntako/split-it)
 An expense splitting CLI program.
 
 ## Getting Started

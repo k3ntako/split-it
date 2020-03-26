@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import App from '../src/App';
-import IMain from '../src/IMain';
+import { IMain } from '../src/Main';
 
 class MockMain implements IMain {
   startCallNum: number;
@@ -8,8 +8,13 @@ class MockMain implements IMain {
     this.startCallNum = 0;
   }
 
-  start(): void {
+  async start(): Promise<void> {
     this.startCallNum++;
+    return Promise.resolve();
+  }
+
+  async getPerson(): Promise<void> {
+    return Promise.resolve();
   }
 }
 
