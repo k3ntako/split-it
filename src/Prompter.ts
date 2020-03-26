@@ -1,15 +1,15 @@
-import { ICLI } from './CLI';
+import { IO } from './CLI';
 import { Answers, ListQuestionOptions, InputQuestionOptions } from 'inquirer';
 
 export interface IPrompter {
-  cli: ICLI;
+  cli: IO;
   promptList(message: string, choices: string[]): Promise<Answers>;
   promptInput(message: string): Promise<Answers>;
 }
 
 export default class Prompter implements IPrompter{
-  cli: ICLI;
-  constructor(cli: ICLI){
+  cli: IO;
+  constructor(cli: IO){
     this.cli = cli;
   }
 

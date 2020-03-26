@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 
-export interface ICLIFileIO {
+export interface IFileIO {
   writeJSON(dir: string, json: [] | {}): void;
   readJSON(dir: string): {} | null;
 }
 
-export default class CLIFileIO implements ICLIFileIO{
+export default class FileIO implements IFileIO{
   private baseDir: string;
 
   constructor(){
@@ -17,7 +17,7 @@ export default class CLIFileIO implements ICLIFileIO{
     const fileDir: string = this.baseDir + dir;
     const folderDir: string = path.dirname(fileDir);
     
-    this.softCreateDir(folderDir);
+    this.createDirIfDoesNotExist(folderDir);
 
     const jsonStr = JSON.stringify(json);
 
@@ -37,7 +37,7 @@ export default class CLIFileIO implements ICLIFileIO{
     return JSON.parse(jsonStr);
   }
 
-  private softCreateDir(folderDir: string): void{
+  private createDirIfDoesNotExist(folderDir: string): void{
     const folderExists: boolean = fs.existsSync(folderDir);
     !folderExists && fs.mkdirSync(folderDir);
   }

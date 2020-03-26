@@ -1,7 +1,7 @@
-import { ICLI } from '../../src/CLI';
+import { IO } from '../../src/CLI';
 import { Answers, Question } from 'inquirer';
 
-export default class MockCLI implements ICLI {
+export default class MockCLI implements IO {
   printArguments: string[];
   clearCallNum: number;
   promptArguments: Question[];

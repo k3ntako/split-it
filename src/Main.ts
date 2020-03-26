@@ -1,4 +1,4 @@
-import { ICLI } from './CLI';
+import { IO } from './CLI';
 import { IPrompter } from './Prompter';
 
 export interface IMain {
@@ -6,10 +6,10 @@ export interface IMain {
 }
 
 export default class Main implements IMain {
-  cli: ICLI;
+  cli: IO;
   prompter: IPrompter;
 
-  constructor(cli: ICLI, prompter: IPrompter) {
+  constructor(cli: IO, prompter: IPrompter) {
     this.cli = cli;
     this.prompter = prompter;
   }

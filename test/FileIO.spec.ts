@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import CLIFileIO from '../src/CLIFileIO';
+import FileIO from '../src/FileIO';
 import fs from 'fs';
 import del from 'del';
 
@@ -21,9 +21,7 @@ describe('writeJSON', () => {
   });
 
   it('should save object in JSON file', () => {
-    
-
-    const fileIO = new CLIFileIO();
+    const fileIO = new FileIO();
     const fileDir = '/test/testData/data.json';
     fileIO.writeJSON(fileDir, ANIMAL_JSON);
    
@@ -34,7 +32,7 @@ describe('writeJSON', () => {
   });
   
   it('should return object from JSON file', () => {
-    const fileIO: CLIFileIO = new CLIFileIO();
+    const fileIO: FileIO = new FileIO();
 
     const fileDir: string = '/test/testData/data.json';
     const jsonFromFile: {} | null = fileIO.readJSON(fileDir);
