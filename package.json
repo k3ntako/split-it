@@ -6,9 +6,11 @@
   "dependencies": {
     "@types/clear": "^0.1.0",
     "@types/node": "^13.9.2",
+    "@types/uuid": "^7.0.2",
     "clear": "^0.1.0",
     "inquirer": "^7.1.0",
-    "source-map-support": "^0.5.16"
+    "source-map-support": "^0.5.16",
+    "uuid": "^7.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",

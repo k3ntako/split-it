@@ -3,40 +3,50 @@ import FileIO from '../src/FileIO';
 import fs from 'fs';
 import del from 'del';
 
-const ANIMAL_JSON: {}[] = [{ 
+const KOALA: {} = { 
   name: 'Koala',
   scientificClassifications: 'Phascolarctos cinereus',
   personality: 'Hella sleepy',
   conservationStatus: 'Vulnerable',
-}, {
-  name: 'Brown-throated sloth',
-  scientificClassifications: 'Bradypus variegatus',
-  personality: 'Lazy beyond your wildest imaginations',
-  conservationStatus: 'Least Concern',
-}];
+};
 
-describe('writeJSON', () => {
+let animalsRowId: string;
+
+describe('FileIO', () => {
   after(async () => {
-    await del([process.cwd() + '/test/testData']);
+    await del([process.cwd() + '/data']);
   });
 
-  it('should save object in JSON file', () => {
-    const fileIO = new FileIO();
-    const fileDir = '/test/testData/data.json';
-    fileIO.writeJSON(fileDir, ANIMAL_JSON);
-   
-    const jsonStr = fs.readFileSync(process.cwd() + fileDir, 'utf8');
-    const jsonFromFile = JSON.parse(jsonStr); 
+  describe('writeRow', () => {
+    it('should save object in JSON file', () => {
+      const fileIO = new FileIO();
+      const koala = fileIO.writeRow('animals', KOALA);
+    
+      // Get object from database
+      const databaseFileDir = '/data/animals.json';
+      const jsonStr = fs.readFileSync(process.cwd() + databaseFileDir, 'utf8');
+      const jsonFromFile = JSON.parse(jsonStr); 
 
-    expect(jsonFromFile).to.eql(ANIMAL_JSON);
+      const keys = Object.keys(KOALA).concat('id');      
+      expect(jsonFromFile[0]).to.have.all.keys(keys);
+
+      //used in next test
+      animalsRowId = koala.id;
+    });
   });
   
-  it('should return object from JSON file', () => {
-    const fileIO: FileIO = new FileIO();
+  describe('readRow', () => {
+    it('should return object from JSON file', () => {
+      const fileIO: FileIO = new FileIO();
 
-    const fileDir: string = '/test/testData/data.json';
-    const jsonFromFile: {} | null = fileIO.readJSON(fileDir);
+      const jsonFromFile: {} | null = fileIO.readRow('animals', animalsRowId);
 
-    expect(jsonFromFile).to.eql(ANIMAL_JSON);
-  }); 
+      if (jsonFromFile) {
+        const keys = Object.keys(KOALA).concat('id');
+        expect(jsonFromFile).to.have.all.keys(keys);
+      } else {
+        expect(jsonFromFile).to.exist;
+      }
+    }); 
+  });
 });
