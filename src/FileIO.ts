@@ -10,12 +10,12 @@ export interface ITable {
   [key: string]: IRow;
 }
 
-export interface IFileIO {
+export interface IDatabaseIO {
   writeRow(tableName: string, data: [] | {}): IRow;
   readRow(tableName: string, id: string): IRow | null;
 }
 
-export default class FileIO implements IFileIO{
+export default class FileIO implements IDatabaseIO{
   private baseDir: string;
   private dbDir: string;
 
@@ -24,7 +24,7 @@ export default class FileIO implements IFileIO{
     this.dbDir = this.baseDir + '/data';
   }
 
-  writeRow(tableName: string, data: {}): IRow {//change this
+  writeRow(tableName: string, data: {}): IRow {
     try {
       const tableDir: string = this.dbDir + '/' + tableName + '.json';
       this.createDirIfDoesNotExist();
