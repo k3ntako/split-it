@@ -18,12 +18,14 @@ class MockMain implements IMain {
   }
 }
 
-describe('welcome message', () => {
-  it('should call print with welcome message', () => {
-    const mockMain: MockMain = new MockMain();
-    const app = new App(mockMain);
-    app.start();
+describe('App', () => {
+  describe('start', () => {
+    it('should start Main', () => {
+      const mockMain: MockMain = new MockMain();
+      const app = new App(mockMain);
+      app.start();
 
-    expect(mockMain.startCallNum).to.equal(1);
+      expect(mockMain.startCallNum).to.equal(1);
+    });
   });
 });
