@@ -1,10 +1,18 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
+export interface IRow {
+  [key: string]: string | number;
+  id: string;
+}
+
+export interface ITable {
+  [key: string]: IRow;
+}
 
 export interface IFileIO {
-  writeRow(tableName: string, data: [] | {}): void;
-  readRow(tableName: string, id: string): {} | null;
+  writeRow(tableName: string, data: [] | {}): IRow;
+  readRow(tableName: string, id: string): IRow | null;
 }
 
 export default class FileIO implements IFileIO{
@@ -16,43 +24,38 @@ export default class FileIO implements IFileIO{
     this.dbDir = this.baseDir + '/data';
   }
 
-  writeRow(tableName: string, data: {}): any {//change this
+  writeRow(tableName: string, data: {}): IRow {//change this
     try {
       const tableDir: string = this.dbDir + '/' + tableName + '.json';
       this.createDirIfDoesNotExist();
 
-      const dataWithId = Object.assign({
-        id: uuidv4(),
-      }, data);
+      const id: string = uuidv4();
+      const dataWithId: IRow = Object.assign({ id }, data);
 
-      let tableData = this.readTable(tableName);
-
-      if (!tableData) {
-        tableData = [dataWithId];
-      } else {        
-        tableData.push(dataWithId);
-      }
+      const tableData: ITable | null = this.readTable(tableName) || {};
+      tableData[id] = dataWithId;
       
       const tableStr = JSON.stringify(tableData);
       fs.writeFileSync(tableDir, tableStr, { encoding: 'utf-8', flag: 'w' });
 
       return dataWithId;
     } catch (error) {
-      console.error(error);
+      console.debug(error);
+      throw new Error(error);
     }
   }
 
-  readRow(tableName: string, id: string): {} | null {
-    const tableData: any[] = this.readTable(tableName);
+  readRow(tableName: string, id: string): IRow | null {
+    const tableData: ITable | null = this.readTable(tableName);
     
     if (!tableData) {
       return null;
     }
 
-    return tableData.find(row => row.id === id) || null;
+    return tableData[id] || null;
   }
 
-  private readTable(tableName: string): any{
+  private readTable(tableName: string): ITable | null {
     const tableDir: string = this.dbDir + '/' + tableName + '.json';
 
     const tableExists: boolean = fs.existsSync(tableDir);

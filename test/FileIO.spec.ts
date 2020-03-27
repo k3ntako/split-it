@@ -40,40 +40,48 @@ describe('FileIO', () => {
   describe('writeRow', () => {
     it('should save object in JSON file', () => {
       const fileIO = new FileIO();
-      const koala = fileIO.writeRow('animals', KOALA);
+      const koalaReturned = fileIO.writeRow('animals', KOALA);
     
       // Get object from database
       const databaseFileDir = '/data/animals.json';
       const jsonStr = fs.readFileSync(process.cwd() + databaseFileDir, 'utf8');
       const jsonFromFile = JSON.parse(jsonStr); 
 
+      expect(jsonFromFile).to.be.an('object');
+      expect(Object.keys(jsonFromFile)).to.have.lengthOf(1);
+
+      const koalaInFile = jsonFromFile[koalaReturned.id];
+
       const animalKeys = Object.keys(KOALA);   
-      expect(jsonFromFile[0]).to.have.all.keys(animalKeys.concat('id'));
+      expect(koalaInFile).to.have.all.keys(animalKeys.concat('id'));
 
       animalKeys.forEach(key => {
-        expect(jsonFromFile[0][key], `should have expected ${key} in JSON file`).to.equal(KOALA[key]);
-        expect(koala[key], `should have expected ${key} in returned object`).to.equal(KOALA[key]);
+        expect(koalaInFile[key], `should have expected ${key} in JSON file`).to.equal(KOALA[key]);
+        expect(koalaReturned[key], `should have expected ${key} in returned object`).to.equal(KOALA[key]);
       });
 
       // used in readRow test
-      animalsRowId = koala.id;
+      animalsRowId = koalaReturned.id;
     });
 
     it('should save a second object', () => {
       const fileIO = new FileIO();
-      const sloth = fileIO.writeRow('animals', SLOTH);
+      const slothReturned = fileIO.writeRow('animals', SLOTH);
 
       // Get object from database
       const databaseFileDir = '/data/animals.json';
       const jsonStr = fs.readFileSync(process.cwd() + databaseFileDir, 'utf8');
       const jsonFromFile = JSON.parse(jsonStr);
+      const slothFromFile = jsonFromFile[slothReturned.id];
+
+      expect(Object.keys(jsonFromFile)).to.have.lengthOf(2);
 
       const animalKeys = Object.keys(SLOTH);
-      expect(jsonFromFile[1]).to.have.all.keys(animalKeys.concat('id'));
+      expect(slothFromFile).to.have.all.keys(animalKeys.concat('id'));
 
       animalKeys.forEach(key => {
-        expect(jsonFromFile[1][key], `should have expected ${key} in JSON file`).to.equal(SLOTH[key]);
-        expect(sloth[key], `should have expected ${key} in returned object`).to.equal(SLOTH[key]);
+        expect(slothFromFile[key], `should have expected ${key} in JSON file`).to.equal(SLOTH[key]);
+        expect(slothReturned[key], `should have expected ${key} in returned object`).to.equal(SLOTH[key]);
       });
     });
   });
