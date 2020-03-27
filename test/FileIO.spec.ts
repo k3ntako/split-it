@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import FileIO from '../src/FileIO';
 import fs from 'fs';
-import del from 'del';
 
 interface IAnimal {
   [key: string]: string | number;
@@ -30,20 +29,16 @@ const SLOTH: IAnimal = {
 
 let animalsRowId: string;
 
-describe('FileIO', () => {
-  after(async () => {
-    console.log("delete");
-    
-    await del([process.cwd() + '/data']);
-  });
+const databaseFolderDir: string = '/test/data';
 
+describe('FileIO', () => {
   describe('writeRow', () => {
     it('should save object in JSON file', () => {
       const fileIO = new FileIO();
       const koalaReturned = fileIO.writeRow('animals', KOALA);
     
       // Get object from database
-      const databaseFileDir = '/data/animals.json';
+      const databaseFileDir = databaseFolderDir + '/animals.json';
       const jsonStr = fs.readFileSync(process.cwd() + databaseFileDir, 'utf8');
       const jsonFromFile = JSON.parse(jsonStr); 
 
@@ -69,7 +64,7 @@ describe('FileIO', () => {
       const slothReturned = fileIO.writeRow('animals', SLOTH);
 
       // Get object from database
-      const databaseFileDir = '/data/animals.json';
+      const databaseFileDir = databaseFolderDir + '/animals.json';
       const jsonStr = fs.readFileSync(process.cwd() + databaseFileDir, 'utf8');
       const jsonFromFile = JSON.parse(jsonStr);
       const slothFromFile = jsonFromFile[slothReturned.id];

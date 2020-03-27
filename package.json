@@ -36,8 +36,8 @@
   "scripts": {
     "eslint": "eslint",
     "start": "node -r source-map-support/register ./dist/index.js",
-    "tsc_start": "npm run tsc && npm start",
-    "test": "mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts",
+    "tsc_start": "npm run tsc && NODE_ENV=dev npm start",
+    "test": "NODE_ENV=test mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts --file ./test/helpers/after.ts",
     "tsc": "tsc"
   },
   "author": "",

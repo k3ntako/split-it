@@ -4,6 +4,7 @@ class Main {
     constructor(cli, prompter) {
         this.cli = cli;
         this.prompter = prompter;
+        console.log(process.env.NODE_ENV);
     }
     async start() {
         this.cli.clear();

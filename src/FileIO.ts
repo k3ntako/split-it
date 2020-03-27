@@ -1,6 +1,9 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
+const isTest = process.env.NODE_ENV === 'test'
+const databaseFolder = isTest ? '/test/data' : '/data';
+
 export interface IRow {
   [key: string]: string | number;
   id: string;
@@ -21,7 +24,7 @@ export default class FileIO implements IDatabaseIO{
 
   constructor(){
     this.baseDir = process.cwd();
-    this.dbDir = this.baseDir + '/data';
+    this.dbDir = this.baseDir + databaseFolder;
   }
 
   writeRow(tableName: string, data: {}): IRow {
@@ -40,7 +43,7 @@ export default class FileIO implements IDatabaseIO{
 
       return dataWithId;
     } catch (error) {
-      console.debug(error);
+      console.error(error);
       throw new Error(error);
     }
   }
