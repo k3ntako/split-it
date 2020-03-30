@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import User from '../../src/models/User';
-import FileIO from '../../src/FileIO';
+import MockFileIO from '../mockClasses/mockFileIO';
 import del from 'del';
+import { IRowWithoutId } from '../../src/FileIO';
 
 after(async () => {
   await del([process.cwd() + '/test/data']);
@@ -10,20 +11,12 @@ after(async () => {
 describe('User model', () => {
   describe('create', () => {
     it('should create a user', () => {
-      const fileIO = new FileIO();
-      const user = User.create('KentaroCreate', fileIO);
+      const mockFileIO = new MockFileIO();
+      User.create('KentaroCreate', mockFileIO);
 
-      expect(user).to.have.all.keys(['id', 'name']);
-      expect(user.name).to.equal('KentaroCreate');
-
-      const userInFile = fileIO.readRow('users', user.id);
-
-      if (userInFile){
-        expect(userInFile.id).to.equal(user.id);
-        expect(userInFile.name).to.equal(user.name);
-      } else {
-        expect(userInFile).to.exist;
-      } 
+      const [tableName, data]: [string, IRowWithoutId] = mockFileIO.writeRowArguments[0];
+      expect(tableName).to.equal('users');
+      expect(data.name).to.equal('KentaroCreate');
     });
   });
 });
