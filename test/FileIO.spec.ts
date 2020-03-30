@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import FileIO from '../src/FileIO';
+import FileIO, { IRow } from '../src/FileIO';
 import fs from 'fs';
 import del from 'del';
 
@@ -90,7 +90,7 @@ describe('FileIO', () => {
     it('should return object from JSON file', () => {
       const fileIO: FileIO = new FileIO();
 
-      const jsonFromFile: {} | null = fileIO.readRow('animals', animalsRowId);
+      const jsonFromFile:IRow | null = fileIO.readRow('animals', animalsRowId);
 
       if (jsonFromFile) {
         const keys = Object.keys(KOALA).concat('id');

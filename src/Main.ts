@@ -1,7 +1,7 @@
-import { IO } from './CLI';
+import { IUserIO } from './CLI';
 import { IPrompter } from './Prompter';
 import User from './models/User'
-import FileIO from './FileIO';
+import { IDatabaseIO } from './FileIO';
 import { Answers } from 'inquirer';
 
 export interface IMain {
@@ -9,17 +9,19 @@ export interface IMain {
 }
 
 export default class Main implements IMain {
-  cli: IO;
+  userIO: IUserIO;
+  databaseIO: IDatabaseIO;
   prompter: IPrompter;
 
-  constructor(cli: IO, prompter: IPrompter) {
-    this.cli = cli;
+  constructor(userIO: IUserIO, databaseIO: IDatabaseIO, prompter: IPrompter) {
+    this.userIO = userIO;
+    this.databaseIO = databaseIO;
     this.prompter = prompter;
   }
 
   async start(): Promise<void> {
-    this.cli.clear();
-    this.cli.print('Welcome to Split-it!');
+    this.userIO.clear();
+    this.userIO.print('Welcome to Split-it!');
 
     await this.getPerson();
   }
@@ -28,11 +30,11 @@ export default class Main implements IMain {
     const answer: Answers = await this.prompter.promptList('Who is this?', ['New Account']);
 
     if (answer.action === 'New Account'){
-      this.cli.clear();
+      this.userIO.clear();
       const nameAnswer: Answers = await this.prompter.promptInput('What\'s your name?');
       const name: string = nameAnswer.input;
 
-      User.create(name, new FileIO);
+      User.create(name, this.databaseIO);
     }
   }
 }

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Prompter {
-    constructor(cli) {
-        this.cli = cli;
+    constructor(userIO) {
+        this.userIO = userIO;
     }
     async promptList(message, choices) {
         const options = [{
@@ -11,7 +11,7 @@ class Prompter {
                 message,
                 choices,
             }];
-        return await this.cli.prompt(options);
+        return await this.userIO.prompt(options);
     }
     async promptInput(message) {
         const options = [{
@@ -19,7 +19,7 @@ class Prompter {
                 name: 'input',
                 message,
             }];
-        return await this.cli.prompt(options);
+        return await this.userIO.prompt(options);
     }
 }
 exports.default = Prompter;

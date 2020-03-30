@@ -1,7 +1,7 @@
-import { IO } from '../../src/CLI';
+import { IUserIO } from '../../src/CLI';
 import { Answers, Question } from 'inquirer';
 
-export default class MockCLI implements IO {
+export default class MockCLI implements IUserIO {
   printArguments: string[];
   clearCallNum: number;
   promptArguments: Question[];

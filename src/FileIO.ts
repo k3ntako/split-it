@@ -4,8 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 const isTest = process.env.NODE_ENV === 'test'
 const databaseFolder = isTest ? '/test/data' : '/data';
 
-export interface IRow {
+export interface IRowWithoutId {
   [key: string]: string | number;
+}
+
+export interface IRow extends IRowWithoutId {
   id: string;
 }
 
@@ -14,7 +17,7 @@ export interface ITable {
 }
 
 export interface IDatabaseIO {
-  writeRow(tableName: string, data: {}): IRow;
+  writeRow(tableName: string, data: IRowWithoutId): IRow;
   readRow(tableName: string, id: string): IRow | null;
 }
 
@@ -27,7 +30,7 @@ export default class FileIO implements IDatabaseIO{
     this.dbDir = this.baseDir + databaseFolder;
   }
 
-  writeRow(tableName: string, data: {}): IRow {
+  writeRow(tableName: string, data: IRowWithoutId): IRow {
     try {
       const tableDir: string = this.dbDir + '/' + tableName + '.json';
       this.createDirIfDoesNotExist();

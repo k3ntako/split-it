@@ -1,16 +1,16 @@
-import { IO } from './CLI';
+import { IUserIO } from './CLI';
 import { Answers, ListQuestionOptions, InputQuestionOptions } from 'inquirer';
 
 export interface IPrompter {
-  cli: IO;
+  userIO: IUserIO;
   promptList(message: string, choices: string[]): Promise<Answers>;
   promptInput(message: string): Promise<Answers>;
 }
 
 export default class Prompter implements IPrompter{
-  cli: IO;
-  constructor(cli: IO){
-    this.cli = cli;
+  userIO: IUserIO;
+  constructor(userIO: IUserIO){
+    this.userIO = userIO;
   }
 
   async promptList(message: string, choices: string[]): Promise<Answers>{
@@ -21,7 +21,7 @@ export default class Prompter implements IPrompter{
       choices,
     }];
 
-    return await this.cli.prompt(options);
+    return await this.userIO.prompt(options);
   }
 
   async promptInput(message: string): Promise<Answers>{
@@ -31,6 +31,6 @@ export default class Prompter implements IPrompter{
       message,
     }];
 
-    return await this.cli.prompt(options);
+    return await this.userIO.prompt(options);
   }
 }
