@@ -2,6 +2,12 @@ import { expect } from 'chai';
 import Main from '../src/Main';
 import MockCLI from './mockClasses/mockCLI';
 import Prompter, { IPrompter } from '../src/Prompter';
+import fs from 'fs';
+import del from 'del';
+
+after(async () => {
+  await del([process.cwd() + '/test/data']);
+});
 
 describe('Main', () => {
   describe('start', () => {
@@ -37,6 +43,23 @@ describe('Main', () => {
         name: 'input',
         message: "What's your name?",
       });
+    });
+
+    it('should save user to database', async () => {
+      const mockCLI: MockCLI = new MockCLI();
+      mockCLI.promptMockAnswers = [{ action: 'New Account' }, { input: 'K3ntako' }];
+
+      const prompter: IPrompter = new Prompter(mockCLI);
+      const main = new Main(mockCLI, prompter);
+      await main.start();
+
+      const databaseFileDir = process.cwd() + '/test/data/users.json';
+      const tableStr: string = fs.readFileSync(databaseFileDir, 'utf-8');
+      const tableData = JSON.parse(tableStr);
+
+      const key = Object.keys(tableData)[1];
+      
+      expect(tableData[key].name).to.equal('K3ntako');
     });
   });
 });

@@ -38,7 +38,7 @@ export default class FileIO implements IDatabaseIO{
       const tableData: ITable | null = this.readTable(tableName) || {};
       tableData[id] = dataWithId;
       
-      const tableStr = JSON.stringify(tableData);
+      const tableStr = JSON.stringify(tableData); 
       fs.writeFileSync(tableDir, tableStr, { encoding: 'utf-8', flag: 'w' });
 
       return dataWithId;

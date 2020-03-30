@@ -1,6 +1,11 @@
 import { expect } from 'chai';
 import FileIO from '../src/FileIO';
 import fs from 'fs';
+import del from 'del';
+
+after(async () => {
+  await del([process.cwd() + '/test/data']);
+});
 
 interface IAnimal {
   [key: string]: string | number;

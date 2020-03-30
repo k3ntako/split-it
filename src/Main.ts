@@ -1,5 +1,7 @@
 import { IO } from './CLI';
 import { IPrompter } from './Prompter';
+import User from './models/User'
+import FileIO from './FileIO';
 
 export interface IMain {
   start(): Promise<void>;
@@ -26,7 +28,10 @@ export default class Main implements IMain {
 
     if (answer.action === 'New Account'){
       this.cli.clear();
-      await this.prompter.promptInput('What\'s your name?');
+      const nameAnswer = await this.prompter.promptInput('What\'s your name?');
+      const name = nameAnswer.input;
+
+      User.create(name, new FileIO);
     }
   }
 }
