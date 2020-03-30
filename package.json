@@ -16,6 +16,7 @@
     "@types/chai": "^4.2.11",
     "@types/inquirer": "^6.5.0",
     "@types/mocha": "^7.0.2",
+    "@types/uuid-validate": "0.0.1",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
     "chai": "^4.2.0",
@@ -31,7 +32,8 @@
     "mocha": "^7.1.1",
     "prettier": "^2.0.2",
     "ts-node": "^8.8.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "uuid-validate": "0.0.3"
   },
   "scripts": {
     "eslint": "eslint",

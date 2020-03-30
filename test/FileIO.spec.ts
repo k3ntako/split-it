@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import validateUUID from 'uuid-validate';
 import FileIO, { IRow } from '../src/FileIO';
 import fs from 'fs';
 import del from 'del';
@@ -32,7 +33,7 @@ const SLOTH: IAnimal = {
   lifespan: 35,
 };
 
-let animalsRowId: string;
+let koalaId: string;
 
 const databaseFolderDir: string = '/test/data';
 
@@ -55,13 +56,16 @@ describe('FileIO', () => {
       const animalKeys = Object.keys(KOALA);   
       expect(koalaInFile).to.have.all.keys(animalKeys.concat('id'));
 
+      expect(validateUUID(koalaInFile.id, 4), 'Expected id to be a UUIDv4').to.be.true;
+      expect(validateUUID(koalaReturned.id, 4), 'Expected id to be a UUIDv4').to.be.true;
+
       animalKeys.forEach(key => {
         expect(koalaInFile[key], `should have expected ${key} in JSON file`).to.equal(KOALA[key]);
         expect(koalaReturned[key], `should have expected ${key} in returned object`).to.equal(KOALA[key]);
       });
 
       // used in readRow test
-      animalsRowId = koalaReturned.id;
+      koalaId = koalaReturned.id;
     });
 
     it('should save a second object', () => {
@@ -90,11 +94,16 @@ describe('FileIO', () => {
     it('should return object from JSON file', () => {
       const fileIO: FileIO = new FileIO();
 
-      const jsonFromFile:IRow | null = fileIO.readRow('animals', animalsRowId);
+      const jsonFromFile:IRow | null = fileIO.readRow('animals', koalaId);
 
       if (jsonFromFile) {
         const keys = Object.keys(KOALA).concat('id');
         expect(jsonFromFile).to.have.all.keys(keys);
+
+        const expectedKoala = Object.assign({ id: koalaId }, KOALA);
+
+        expect(validateUUID(jsonFromFile.id, 4), 'Expected id to be a UUIDv4').to.be.true;
+        expect(jsonFromFile).to.eql(expectedKoala);
       } else {
         expect(jsonFromFile).to.exist;
       }
