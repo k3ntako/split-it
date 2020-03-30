@@ -1,11 +1,11 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface IRowWithoutId {
+export interface IObjectWithAny {
   [key: string]: string | number;
 }
 
-export interface IRow extends IRowWithoutId {
+export interface IRow extends IObjectWithAny {
   id: string;
 }
 
@@ -14,8 +14,9 @@ export interface ITable {
 }
 
 export interface IDatabaseIO {
-  writeRow(tableName: string, data: IRowWithoutId): IRow;
+  writeRow(tableName: string, data: IObjectWithAny): IRow;
   readRow(tableName: string, id: string): IRow | null;
+  findOne(tableName: string, where: {}): IRow | null;
 }
 
 export default class FileIO implements IDatabaseIO{
@@ -27,7 +28,7 @@ export default class FileIO implements IDatabaseIO{
     this.dbDir = this.baseDir + databaseFolder;
   }
 
-  writeRow(tableName: string, data: IRowWithoutId): IRow {
+  writeRow(tableName: string, data: IObjectWithAny): IRow {
     try {
       const tableDir: string = this.dbDir + '/' + tableName + '.json';
       this.createDirIfDoesNotExist();
@@ -57,6 +58,30 @@ export default class FileIO implements IDatabaseIO{
 
     return tableData[id] || null;
   }
+
+  findOne(tableName: string, where: IObjectWithAny){
+    const tableData = this.readTable(tableName);
+
+    const keys: false | string[] = where && Object.keys(where);
+
+    if (!keys || !keys.length) {
+      throw new Error('You must pass in a ')
+    }
+
+    let rowData: IRow | null = null;
+    for(const id in tableData) {
+      const row: IRow = tableData[id];
+      const isAMatch = keys.every(key => row[key] === where[key]);
+
+      if (isAMatch) {
+        rowData = row;
+        break;
+      }
+    }
+
+    return rowData;
+  };
+
 
   private readTable(tableName: string): ITable | null {
     const tableDir: string = this.dbDir + '/' + tableName + '.json';
