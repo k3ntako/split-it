@@ -65,7 +65,7 @@ export default class FileIO implements IDatabaseIO{
     const keys: false | string[] = where && Object.keys(where);
 
     if (!keys || !keys.length) {
-      throw new Error('You must pass in a ')
+      throw new Error('You must pass in at least one attribute');
     }
 
     let rowData: IRow | null = null;
@@ -81,7 +81,6 @@ export default class FileIO implements IDatabaseIO{
 
     return rowData;
   };
-
 
   private readTable(tableName: string): ITable | null {
     const tableDir: string = this.dbDir + '/' + tableName + '.json';
