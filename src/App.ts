@@ -1,18 +1,18 @@
-import IPage from './pages/IPage';
+import { IRouter } from './Router';
 
 export interface IApp {
-  main: IPage;
+  router: IRouter;
   start(): void;
 }
 
 export default class App implements IApp {
-  main: IPage;
+  router: IRouter;
 
-  constructor(main: IPage){
-    this.main = main;
+  constructor(router: IRouter){
+    this.router = router;
   }
 
   start(){
-    this.main.start();
+    this.router.start();
   }
 }

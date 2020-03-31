@@ -1,3 +1,3 @@
 export default interface IPage {
-  start(): Promise<void>;
+  display(): IPage | Promise<IPage> | null | Promise<null>;
 }

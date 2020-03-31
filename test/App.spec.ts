@@ -1,31 +1,17 @@
 import { expect } from 'chai';
 import App from '../src/App';
-import IPage from '../src/pages/IPage';
-
-class MockMain implements IPage {
-  startCallNum: number;
-  constructor() {
-    this.startCallNum = 0;
-  }
-
-  async start(): Promise<void> {
-    this.startCallNum++;
-    return Promise.resolve();
-  }
-
-  async getPerson(): Promise<void> {
-    return Promise.resolve();
-  }
-}
+import MockPage from './mockClasses/mockPage';
+import MockRouter from './mockClasses/mockRouter';
 
 describe('App', () => {
   describe('start', () => {
-    it('should start WelcomePage', () => {
-      const mockMain: MockMain = new MockMain();
-      const app = new App(mockMain);
+    it('should start router', () => {
+      const mockPage = new MockPage;
+      const mockRouter: MockRouter = new MockRouter(mockPage);
+      const app = new App(mockRouter);
       app.start();
 
-      expect(mockMain.startCallNum).to.equal(1);
+      expect(mockRouter.startCallNum).to.equal(1);
     });
   });
 });
