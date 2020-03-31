@@ -4,7 +4,7 @@ import MockCLI from './mockClasses/mockCLI';
 
 describe('Prompter', () => {
   describe('promptList', () => {
-    it('should call print with welcome message', async () => {
+    it('should ask for a multiple choice input', async () => {
       const mockCLI: MockCLI = new MockCLI();
       const promptPreparer = new Prompter(mockCLI);
 
@@ -20,7 +20,7 @@ describe('Prompter', () => {
   });
 
   describe('promptInput', () => {
-    it('should call print with welcome message', async () => {
+    it('should ask for a text input', async () => {
       const mockCLI: MockCLI = new MockCLI();
       const promptPreparer = new Prompter(mockCLI);
 

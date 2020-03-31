@@ -1,18 +1,18 @@
-import { IMain } from './Main';
+import { IRouter } from './Router';
 
 export interface IApp {
-  main: IMain;
-  start(): void;
+  router: IRouter;
+  start(): Promise<void>;
 }
 
 export default class App implements IApp {
-  main: IMain;
+  router: IRouter;
 
-  constructor(main: IMain){
-    this.main = main;
+  constructor(router: IRouter){
+    this.router = router;
   }
 
-  start(){
-    this.main.start();
+  async start(){
+    await this.router.displayPages();
   }
 }
