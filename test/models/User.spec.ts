@@ -35,5 +35,14 @@ describe('User model', () => {
       const userCreateMethod = () => User.validate('UserModelCreate2', fileIO)
       expect(userCreateMethod).to.throw(Error);
     });
+
+    it('should throw error given a name already exists in db regardless of case', () => {
+      const fileIO = new FileIO();
+      User.create('UserModelCreate3', fileIO);
+
+      // Lowercase name - still should throw error
+      const userCreateMethod = () => User.validate('UserModelCreate3'.toLowerCase(), fileIO)
+      expect(userCreateMethod).to.throw(Error);
+    });
   });
 });

@@ -114,11 +114,31 @@ describe('FileIO', () => {
   });
 
   describe('findOne', () => {
-    it('should find animals based on attributes passed in', () => {
+    it('should find an animal based on attributes passed in', () => {
       const fileIO: FileIO = new FileIO();
 
       const jsonFromFile: IRow | null = fileIO.findOne('animals', {
         name: 'Brown-throated sloth'
+      });
+
+      if (jsonFromFile) {
+        const keys = Object.keys(SLOTH).concat('id');
+        expect(jsonFromFile).to.have.all.keys(keys);
+
+        const expectedSloth = Object.assign({ id: slothId }, SLOTH);
+
+        expect(validateUUID(jsonFromFile.id, 4), 'Expected id to be a UUIDv4').to.be.true;
+        expect(jsonFromFile).to.eql(expectedSloth);
+      } else {
+        expect(jsonFromFile).to.exist;
+      }
+    });
+
+    it('should find an animal regardless of case given ILIKE', () => {
+      const fileIO: FileIO = new FileIO();
+
+      const jsonFromFile: IRow | null = fileIO.findOne('animals', {
+        name: { ILIKE: 'Brown-throated sloth'.toLowerCase() },
       });
 
       if (jsonFromFile) {

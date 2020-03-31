@@ -2,7 +2,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface IObjectWithAny {
-  [key: string]: string | number;
+  [key: string]: string | number | IObjectWithAny; 
 }
 
 export interface IRow extends IObjectWithAny {
@@ -59,7 +59,7 @@ export default class FileIO implements IDatabaseIO{
     return tableData[id] || null;
   }
 
-  findOne(tableName: string, where: IObjectWithAny){
+  findOne(tableName: string, where: IObjectWithAny): IRow | null {
     const tableData = this.readTable(tableName);
 
     const keys: false | string[] = where && Object.keys(where);
@@ -71,7 +71,13 @@ export default class FileIO implements IDatabaseIO{
     let rowData: IRow | null = null;
     for(const id in tableData) {
       const row: IRow = tableData[id];
-      const isAMatch = keys.every(key => row[key] === where[key]);
+      const isAMatch = keys.every(key => {
+        if (typeof where[key] === 'object') {
+          return this.advancedCompare(key, row, where);
+        } else {
+          return row[key] === where[key];
+        }
+      });
 
       if (isAMatch) {
         rowData = row;
@@ -81,6 +87,22 @@ export default class FileIO implements IDatabaseIO{
 
     return rowData;
   };
+
+  private advancedCompare(key: string, row: IRow, where: IObjectWithAny): boolean {
+    const rowValue = row[key];
+    const whereForValue = where[key];
+
+    const queryType = Object.keys(whereForValue)[0];
+    if (queryType === 'ILIKE'){
+      if (typeof rowValue === 'string' && typeof whereForValue['ILIKE'] === 'string'){
+        return rowValue.toLowerCase() === whereForValue.ILIKE.toLowerCase();
+      } else {
+        throw new Error('ILIKE can only be used on strings');
+      }
+    }
+
+    return false;
+  }
 
   private readTable(tableName: string): ITable | null {
     const tableDir: string = this.dbDir + '/' + tableName + '.json';

@@ -28,7 +28,9 @@ export default class User implements IUser {
       throw new Error('Name cannot be blank');
     }
 
-    const existingUser: IRow | null = io.findOne('users', { name });
+    const existingUser: IRow | null = io.findOne('users', { 
+      name: { ILIKE: name }
+    });
     if (existingUser) {
       throw new Error(`The name, ${name}, is already taken.`);
     }
