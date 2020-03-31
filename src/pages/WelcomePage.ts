@@ -2,7 +2,7 @@ import { IUserIO } from '../CLI';
 import Prompter from '../Prompter';
 import FileIO from '../FileIO';
 import IPage from './IPage';
-import LoginPage from './LogInPage';
+import LoginPage from './LoginPage';
 
 export default class WelcomePage implements IPage {
   userIO: IUserIO;

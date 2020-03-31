@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import WelcomePage from '../../src/pages/WelcomePage';
-// import LoginPage from '../../src/pages/LoginPage';
+import LoginPage from '../../src/pages/LoginPage';
 import MockCLI from './../mockClasses/mockCLI';
 
 describe('WelcomePage', () => {
@@ -19,8 +19,7 @@ describe('WelcomePage', () => {
       const welcomePage = new WelcomePage(mockCLI);
       const nextPage = welcomePage.display();
 
-      expect(nextPage.constructor.name).to.equal('LoginPage');
-      // expect(nextPage).to.be.an.instanceOf(LoginPage);
+      expect(nextPage).to.be.an.instanceOf(LoginPage);
     });
   });
 });
