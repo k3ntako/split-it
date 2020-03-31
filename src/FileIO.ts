@@ -13,6 +13,14 @@ export interface ITable {
   [key: string]: IRow;
 }
 
+export interface IAdvancedWhere {
+  ILIKE?: string
+}
+
+export interface IWhere {
+  [key: string]: string | number | IAdvancedWhere;
+}
+
 export interface IDatabaseIO {
   writeRow(tableName: string, data: IObjectWithAny): IRow;
   readRow(tableName: string, id: string): IRow | null;
@@ -59,23 +67,23 @@ export default class FileIO implements IDatabaseIO{
     return tableData[id] || null;
   }
 
-  findOne(tableName: string, where: IObjectWithAny): IRow | null {
+  findOne(tableName: string, where: IWhere): IRow | null {
     const tableData = this.readTable(tableName);
 
-    const keys: false | string[] = where && Object.keys(where);
+    const fields: false | string[] = where && Object.keys(where);
 
-    if (!keys || !keys.length) {
+    if (!fields || !fields.length) {
       throw new Error('You must pass in at least one attribute');
     }
 
     let rowData: IRow | null = null;
     for(const id in tableData) {
-      const row: IRow = tableData[id];
-      const isAMatch = keys.every(key => {
-        if (typeof where[key] === 'object') {
-          return this.advancedCompare(key, row, where);
+      const row: IRow = tableData[id];      
+      const isAMatch = fields.every(field => {
+        if (typeof where[field] === 'object') {          
+          return this.advancedCompare(field, row, where);
         } else {
-          return row[key] === where[key];
+          return row[field] === where[field];
         }
       });
 
@@ -88,13 +96,12 @@ export default class FileIO implements IDatabaseIO{
     return rowData;
   };
 
-  private advancedCompare(key: string, row: IRow, where: IObjectWithAny): boolean {
+  private advancedCompare(key: string, row: IRow, where: IWhere): boolean {
     const rowValue = row[key];
     const whereForValue = where[key];
 
-    const queryType = Object.keys(whereForValue)[0];
-    if (queryType === 'ILIKE'){
-      if (typeof rowValue === 'string' && typeof whereForValue['ILIKE'] === 'string'){
+    if (whereForValue && typeof whereForValue === 'object' && whereForValue.ILIKE){     
+      if (typeof rowValue === 'string' && typeof whereForValue.ILIKE === 'string'){
         return rowValue.toLowerCase() === whereForValue.ILIKE.toLowerCase();
       } else {
         throw new Error('ILIKE can only be used on strings');

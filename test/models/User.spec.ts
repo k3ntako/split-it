@@ -29,19 +29,19 @@ describe('User model', () => {
     });
 
     it('should throw error given a name already exists in db', () => {
-      const fileIO = new FileIO();
+      const fileIO = new FileIO('/test/data');
       User.create('UserModelCreate2', fileIO);
 
-      const userCreateMethod = () => User.validate('UserModelCreate2', fileIO)
+      const userCreateMethod = () => User.validate('UserModelCreate2', fileIO);
       expect(userCreateMethod).to.throw(Error);
     });
 
     it('should throw error given a name already exists in db regardless of case', () => {
-      const fileIO = new FileIO();
+      const fileIO = new FileIO('/test/data');
       User.create('UserModelCreate3', fileIO);
 
       // Lowercase name - still should throw error
-      const userCreateMethod = () => User.validate('UserModelCreate3'.toLowerCase(), fileIO)
+      const userCreateMethod = () => User.validate('UserModelCreate3'.toLowerCase(), fileIO);
       expect(userCreateMethod).to.throw(Error);
     });
   });

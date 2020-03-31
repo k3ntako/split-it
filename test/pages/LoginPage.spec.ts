@@ -3,12 +3,12 @@ import LoginPage from '../../src/pages/LoginPage';
 import MockCLI from './../mockClasses/mockCLI';
 import Prompter, { IPrompter } from '../../src/Prompter';
 import MockFileIO from './../mockClasses/mockFileIO';
-import { IRowWithoutId } from '../../src/FileIO';
+import { IObjectWithAny } from '../../src/FileIO';
 
 describe('LoginPage', () => {
   it('should ask user if they would like to create a new account', async () => {
     const mockCLI: MockCLI = new MockCLI();
-    mockCLI.promptMockAnswers = [{ action: 'New Account' }];
+    mockCLI.promptMockAnswers = [{ action: 'New Account' }, { input: 'K' }];
 
     const mockFileIO: MockFileIO = new MockFileIO();
     const prompter: IPrompter = new Prompter(mockCLI);
@@ -42,7 +42,7 @@ describe('LoginPage', () => {
     const loginPage = new LoginPage(mockCLI, mockFileIO, prompter);
     await loginPage.display();
 
-    const [tableName, data]: [string, IRowWithoutId] = mockFileIO.writeRowArguments[0];
+    const [tableName, data]: [string, IObjectWithAny] = mockFileIO.writeRowArguments[0];
     expect(tableName).to.eql('users');
     expect(data.name).to.eql('K3ntako');
   });

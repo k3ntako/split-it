@@ -115,7 +115,7 @@ describe('FileIO', () => {
 
   describe('findOne', () => {
     it('should find an animal based on attributes passed in', () => {
-      const fileIO: FileIO = new FileIO();
+      const fileIO: FileIO = new FileIO(databaseFolderDir);
 
       const jsonFromFile: IRow | null = fileIO.findOne('animals', {
         name: 'Brown-throated sloth'
@@ -135,7 +135,7 @@ describe('FileIO', () => {
     });
 
     it('should find an animal regardless of case given ILIKE', () => {
-      const fileIO: FileIO = new FileIO();
+      const fileIO: FileIO = new FileIO(databaseFolderDir);
 
       const jsonFromFile: IRow | null = fileIO.findOne('animals', {
         name: { ILIKE: 'Brown-throated sloth'.toLowerCase() },
