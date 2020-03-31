@@ -1,14 +1,11 @@
-import { IUserIO } from './CLI';
-import { IPrompter } from './Prompter';
-import User from './models/User'
-import { IDatabaseIO } from './FileIO';
+import { IUserIO } from '../CLI';
+import { IPrompter } from '../Prompter';
+import User from '../models/User'
+import { IDatabaseIO } from '../FileIO';
 import { Answers } from 'inquirer';
+import IPage from './IPage';
 
-export interface IMain {
-  start(): Promise<void>;
-}
-
-export default class Main implements IMain {
+export default class WelcomePage implements IPage {
   userIO: IUserIO;
   databaseIO: IDatabaseIO;
   prompter: IPrompter;

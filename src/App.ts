@@ -1,14 +1,14 @@
-import { IMain } from './Main';
+import IPage from './pages/IPage';
 
 export interface IApp {
-  main: IMain;
+  main: IPage;
   start(): void;
 }
 
 export default class App implements IApp {
-  main: IMain;
+  main: IPage;
 
-  constructor(main: IMain){
+  constructor(main: IPage){
     this.main = main;
   }
 

@@ -1,17 +1,17 @@
 import { expect } from 'chai';
-import Main from '../src/Main';
+import WelcomePage from '../src/pages/WelcomePage';
 import MockCLI from './mockClasses/mockCLI';
 import Prompter, { IPrompter } from '../src/Prompter';
 import MockFileIO from './mockClasses/mockFileIO';
 import { IRowWithoutId } from '../src/FileIO';
 
-describe('Main', () => {
+describe('WelcomePage', () => {
   describe('start', () => {
     it('should call print with welcome message', async () => {
       const mockCLI: MockCLI = new MockCLI();
       const mockFileIO: MockFileIO = new MockFileIO();
       const prompter: IPrompter = new Prompter(mockCLI);
-      const main = new Main(mockCLI, mockFileIO, prompter);
+      const main = new WelcomePage(mockCLI, mockFileIO, prompter);
       await main.start();
 
       expect(mockCLI.clearCallNum).to.be.at.least(1);
@@ -25,7 +25,7 @@ describe('Main', () => {
       const mockFileIO: MockFileIO = new MockFileIO();
       const prompter: IPrompter = new Prompter(mockCLI);
 
-      const main = new Main(mockCLI, mockFileIO, prompter);
+      const main = new WelcomePage(mockCLI, mockFileIO, prompter);
       await main.start();
 
       expect(mockCLI.promptArguments[0]).to.eql({
@@ -51,7 +51,7 @@ describe('Main', () => {
       const mockFileIO: MockFileIO = new MockFileIO();
       const prompter: IPrompter = new Prompter(mockCLI);
 
-      const main = new Main(mockCLI, mockFileIO, prompter);
+      const main = new WelcomePage(mockCLI, mockFileIO, prompter);
       await main.start();
 
       const [tableName, data]: [string, IRowWithoutId] = mockFileIO.writeRowArguments[0];

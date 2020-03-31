@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import App from '../src/App';
-import { IMain } from '../src/Main';
+import IPage from '../src/pages/IPage';
 
-class MockMain implements IMain {
+class MockMain implements IPage {
   startCallNum: number;
   constructor() {
     this.startCallNum = 0;
@@ -20,7 +20,7 @@ class MockMain implements IMain {
 
 describe('App', () => {
   describe('start', () => {
-    it('should start Main', () => {
+    it('should start WelcomePage', () => {
       const mockMain: MockMain = new MockMain();
       const app = new App(mockMain);
       app.start();
