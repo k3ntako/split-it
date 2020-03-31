@@ -1,9 +1,6 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
-const isTest = process.env.NODE_ENV === 'test'
-const databaseFolder = isTest ? '/test/data' : '/data';
-
 export interface IRowWithoutId {
   [key: string]: string | number;
 }
@@ -25,7 +22,7 @@ export default class FileIO implements IDatabaseIO{
   private baseDir: string;
   private dbDir: string;
 
-  constructor(){
+  constructor(databaseFolder: string = '/data'){
     this.baseDir = process.cwd();
     this.dbDir = this.baseDir + databaseFolder;
   }

@@ -40,7 +40,7 @@ const databaseFolderDir: string = '/test/data';
 describe('FileIO', () => {
   describe('writeRow', () => {
     it('should save object in JSON file', () => {
-      const fileIO = new FileIO();
+      const fileIO = new FileIO(databaseFolderDir);
       const koalaReturned = fileIO.writeRow('animals', KOALA);
     
       // Get object from database
@@ -69,7 +69,7 @@ describe('FileIO', () => {
     });
 
     it('should save a second object', () => {
-      const fileIO = new FileIO();
+      const fileIO = new FileIO(databaseFolderDir);
       const slothReturned = fileIO.writeRow('animals', SLOTH);
 
       // Get object from database
@@ -92,7 +92,7 @@ describe('FileIO', () => {
   
   describe('readRow', () => {
     it('should return object from JSON file', () => {
-      const fileIO: FileIO = new FileIO();
+      const fileIO: FileIO = new FileIO(databaseFolderDir);
 
       const jsonFromFile:IRow | null = fileIO.readRow('animals', koalaId);
 
