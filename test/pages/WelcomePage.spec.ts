@@ -5,7 +5,7 @@ import MockCLI from './../mockClasses/mockCLI';
 
 describe('WelcomePage', () => {
   describe('display', () => {
-    it('should call print with welcome message', async () => {
+    it('should call print with welcome message', () => {
       const mockCLI: MockCLI = new MockCLI();
       const welcomePage = new WelcomePage(mockCLI);
       welcomePage.display();
@@ -14,7 +14,7 @@ describe('WelcomePage', () => {
       expect(mockCLI.printArguments[0]).to.equal('Welcome to Split-it!');
     });
 
-    it('should return next page to display', async () => {
+    it('should return next page to display', () => {
       const mockCLI: MockCLI = new MockCLI();
       const welcomePage = new WelcomePage(mockCLI);
       const nextPage = welcomePage.display();

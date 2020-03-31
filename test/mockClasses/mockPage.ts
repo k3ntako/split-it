@@ -1,13 +1,17 @@
 import IPage from "../../src/pages/IPage";
 
 export default class MockPage implements IPage {
-  startCallNum: number;
+  displayCallNum: number;
+  mockNextPage: IPage | null;
+
   constructor() {
-    this.startCallNum = 0;
+    this.displayCallNum = 0;
+    this.mockNextPage = null;
   }
 
-  display(): null {
-    this.startCallNum++;
-    return null;
+  display(): IPage | null {
+    this.displayCallNum++;
+
+    return this.mockNextPage;
   }
 }

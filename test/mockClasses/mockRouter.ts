@@ -11,14 +11,8 @@ export default class MockRouter implements IRouter {
     this.navigateToCall = 0;
   }
 
-  start(): void{
-    this.currentPage.display();
+  async displayPages(): Promise<void>{
+    await this.currentPage.display();
     this.startCallNum++;
-  }
-
-  navigateTo(page: IPage): void{
-    this.currentPage = page;
-    this.currentPage.display();
-    this.navigateToCall++;
   }
 }

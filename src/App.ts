@@ -2,7 +2,7 @@ import { IRouter } from './Router';
 
 export interface IApp {
   router: IRouter;
-  start(): void;
+  start(): Promise<void>;
 }
 
 export default class App implements IApp {
@@ -12,7 +12,7 @@ export default class App implements IApp {
     this.router = router;
   }
 
-  start(){
-    this.router.start();
+  async start(){
+    await this.router.displayPages();
   }
 }
