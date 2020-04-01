@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import User from '../../src/models/User';
 import MockFileIO from '../mockClasses/mockFileIO';
 import del from 'del';
-import FileIO, { IObjectWithAny } from '../../src/FileIO';
+import FileIO, { IRow } from '../../src/FileIO';
 
 after(async () => {
   await del([process.cwd() + '/test/data']);
@@ -14,7 +14,7 @@ describe('User model', () => {
       const mockFileIO = new MockFileIO();
       User.create('UserModelCreate1', mockFileIO);
 
-      const [tableName, data]: [string, IObjectWithAny] = mockFileIO.writeRowArguments[0];
+      const [tableName, data]: [string, IRow] = mockFileIO.writeRowArguments[0];
       expect(tableName).to.equal('users');
       expect(data.name).to.equal('UserModelCreate1');
     });

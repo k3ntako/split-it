@@ -1,8 +1,8 @@
 const comparerNames: string[] = ['ILIKE'];
 
 export interface IComparer {
-  validate(rowValue: any, queryValue: any): boolean;
-  compare(rowValue: any, queryValue: any): boolean;
+  validate(rowValue: string | number, queryValue: string | number): boolean;
+  compare(rowValue: string | number, queryValue: string | number): boolean;
 }
 
 export interface IComparers {

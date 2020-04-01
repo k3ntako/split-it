@@ -2,11 +2,11 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import comparers, { IComparer } from './comparers';
 
-export interface IObjectWithAny {
-  [key: string]: string | number | IObjectWithAny; 
+export interface IData {
+  [key: string]: string | number; 
 }
 
-export interface IRow extends IObjectWithAny {
+export interface IRow extends IData {
   id: string;
 }
 
@@ -15,15 +15,16 @@ export interface ITable {
 }
 
 export interface IAdvancedWhere {
-  ILIKE?: string
+  [key: string]: string | undefined;
+  ILIKE?: string;
 }
 
 export interface IWhere {
-  [key: string]: string | number | IAdvancedWhere;
+  [key: string]: string | IAdvancedWhere;
 }
 
 export interface IDatabaseIO {
-  writeRow(tableName: string, data: IObjectWithAny): IRow;
+  writeRow(tableName: string, data: IData): IRow;
   readRow(tableName: string, id: string): IRow | null;
   findOne(tableName: string, where: {}): IRow | null;
 }
@@ -37,7 +38,7 @@ export default class FileIO implements IDatabaseIO{
     this.dbDir = this.baseDir + databaseFolder;
   }
 
-  writeRow(tableName: string, data: IObjectWithAny): IRow {
+  writeRow(tableName: string, data: IData): IRow {
     try {
       const tableDir: string = this.dbDir + '/' + tableName + '.json';
       this.createDirIfDoesNotExist();
@@ -80,7 +81,7 @@ export default class FileIO implements IDatabaseIO{
         const rowValue = row[field];
         const whereForField = where[field];
 
-        if (typeof where[field] === 'object') {          
+        if (typeof whereForField === 'object') {          
           return this.advancedCompare(rowValue, whereForField);
         } else {
           return rowValue === whereForField;
@@ -106,15 +107,15 @@ export default class FileIO implements IDatabaseIO{
     return fields;
   }
 
-  private advancedCompare(rowValue: any, whereForField: any): boolean {
+  private advancedCompare(rowValue: string | number, whereForField: IAdvancedWhere): boolean {
     return Object.keys(whereForField).every(comparisonType => {
       const comparer: IComparer = comparers[comparisonType];
-      const queryValue = whereForField[comparisonType];
+      const queryValue: string | undefined = whereForField[comparisonType];
 
       if (!comparer ) {
         throw new Error(`${comparisonType} is not a comparer.`);
       } else if (queryValue === undefined){
-        throw new Error(`${queryValue} cannot be undefined.`);
+        throw new Error(`Value for ${comparisonType} cannot be undefined.`);
       }
 
       const isValid = comparer.validate(rowValue, queryValue);

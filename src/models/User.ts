@@ -31,6 +31,7 @@ export default class User implements IUser {
     const existingUser: IRow | null = io.findOne('users', { 
       name: { ILIKE: name }
     });
+
     if (existingUser) {
       throw new Error(`The name, ${name}, is already taken.`);
     }

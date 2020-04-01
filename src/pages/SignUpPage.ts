@@ -19,14 +19,19 @@ export default class SignUpPage implements IPage {
   async display(): Promise<null> {
     this.userIO.clear();
 
-    const answer: Answers = await this.prompter.promptList('Who is this?', ['New Account']);
+    let isValid: boolean = false;
+    while (!isValid) {
+      try {
+        const nameAnswer: Answers = await this.prompter.promptInput('What\'s your name?');
+        const name: string = nameAnswer.input;
 
-    if (answer.action === 'New Account') {
-      this.userIO.clear();
-      const nameAnswer: Answers = await this.prompter.promptInput('What\'s your name?');
-      const name: string = nameAnswer.input;
+        User.create(name, this.databaseIO);
 
-      User.create(name, this.databaseIO);
+        isValid = true;
+      } catch (error) {
+        this.userIO.clear();
+        this.userIO.print(`${error} - try again!`);
+      }
     }
     
     return null;
