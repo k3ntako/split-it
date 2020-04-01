@@ -1,4 +1,4 @@
-import { IComparer } from ".";
+import { IComparer } from "./index";
 
 const ILIKE: IComparer = {
   compare(rowValue: string, queryValue: string): boolean {

@@ -45,8 +45,6 @@ describe('SignUpPage', () => {
 
     const loginPage = new SignUpPage(mockCLI, mockFileIO, prompter);
     await loginPage.display();
-    
-
 
     expect(mockFileIO.writeRowArguments[1][1].name).to.equal('New valid name');
   });

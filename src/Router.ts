@@ -14,7 +14,8 @@ export default class Router implements IRouter {
 
   async displayPages(){
     while (this.currentPage) {
-      this.currentPage = await this.currentPage.display();
+      const nextPage = await this.currentPage.display();
+      this.currentPage = nextPage;
     }
   }
 }
