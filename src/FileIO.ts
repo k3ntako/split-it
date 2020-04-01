@@ -26,7 +26,7 @@ export interface IWhere {
 export interface IDatabaseIO {
   writeRow(tableName: string, data: IData): IRow;
   readRow(tableName: string, id: string): IRow | null;
-  findOne(tableName: string, where: {}): IRow | null;
+  findOne(tableName: string, where: IWhere): IRow | null;
 }
 
 export default class FileIO implements IDatabaseIO{
