@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import comparers, { IComparer } from './comparers';
 
 export interface IObjectWithAny {
   [key: string]: string | number | IObjectWithAny; 
@@ -70,20 +71,19 @@ export default class FileIO implements IDatabaseIO{
   findOne(tableName: string, where: IWhere): IRow | null {
     const tableData = this.readTable(tableName);
 
-    const fields: false | string[] = where && Object.keys(where);
-
-    if (!fields || !fields.length) {
-      throw new Error('You must pass in at least one attribute');
-    }
+    const fields = this.getFieldsOnWhere(where);
 
     let rowData: IRow | null = null;
     for(const id in tableData) {
       const row: IRow = tableData[id];      
       const isAMatch = fields.every(field => {
+        const rowValue = row[field];
+        const whereForField = where[field];
+
         if (typeof where[field] === 'object') {          
-          return this.advancedCompare(field, row, where);
+          return this.advancedCompare(rowValue, whereForField);
         } else {
-          return row[field] === where[field];
+          return rowValue === whereForField;
         }
       });
 
@@ -96,19 +96,30 @@ export default class FileIO implements IDatabaseIO{
     return rowData;
   };
 
-  private advancedCompare(key: string, row: IRow, where: IWhere): boolean {
-    const rowValue = row[key];
-    const whereForValue = where[key];
+  private getFieldsOnWhere(where: IWhere): string[] {
+    const fields: false | string[] = where && Object.keys(where);
 
-    if (whereForValue && typeof whereForValue === 'object' && whereForValue.ILIKE){     
-      if (typeof rowValue === 'string' && typeof whereForValue.ILIKE === 'string'){
-        return rowValue.toLowerCase() === whereForValue.ILIKE.toLowerCase();
-      } else {
-        throw new Error('ILIKE can only be used on strings');
-      }
+    if (!fields || !fields.length) {
+      throw new Error('You must pass in at least one attribute');
     }
 
-    return false;
+    return fields;
+  }
+
+  private advancedCompare(rowValue: any, whereForField: any): boolean {
+    return Object.keys(whereForField).every(comparisonType => {
+      const comparer: IComparer = comparers[comparisonType];
+      const queryValue = whereForField[comparisonType];
+
+      if (!comparer ) {
+        throw new Error(`${comparisonType} is not a comparer.`);
+      } else if (queryValue === undefined){
+        throw new Error(`${queryValue} cannot be undefined.`);
+      }
+
+      const isValid = comparer.validate(rowValue, queryValue);
+      return isValid && comparer.compare(rowValue, queryValue);
+    });
   }
 
   private readTable(tableName: string): ITable | null {
