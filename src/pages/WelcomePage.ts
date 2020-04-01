@@ -1,6 +1,5 @@
 import { IUserIO } from '../CLI';
 import Prompter from '../Prompter';
-import FileIO from '../FileIO';
 import IPage from './IPage';
 import LoginPage from './LoginPage';
 
@@ -15,6 +14,6 @@ export default class WelcomePage implements IPage {
     this.userIO.clear();
     this.userIO.print('Welcome to Split-it!');
 
-    return new LoginPage(this.userIO, new FileIO, new Prompter(this.userIO));
+    return new LoginPage(this.userIO, new Prompter(this.userIO));
   }
 }
