@@ -33,7 +33,7 @@ const SLOTH: IAnimal = {
   lifespan: 35,
 };
 
-let koalaId: string;
+let koalaId: string, slothId: string;
 
 const databaseFolderDir: string = '/test/data';
 
@@ -87,6 +87,9 @@ describe('FileIO', () => {
         expect(slothFromFile[key], `should have expected ${key} in JSON file`).to.equal(SLOTH[key]);
         expect(slothReturned[key], `should have expected ${key} in returned object`).to.equal(SLOTH[key]);
       });
+
+      // used in findOne test
+      slothId = slothFromFile.id;
     });
   });
   
@@ -108,5 +111,47 @@ describe('FileIO', () => {
         expect(jsonFromFile).to.exist;
       }
     }); 
+  });
+
+  describe('findOne', () => {
+    it('should find an animal based on attributes passed in', () => {
+      const fileIO: FileIO = new FileIO(databaseFolderDir);
+
+      const jsonFromFile: IRow | null = fileIO.findOne('animals', {
+        name: 'Brown-throated sloth'
+      });
+
+      if (jsonFromFile) {
+        const keys = Object.keys(SLOTH).concat('id');
+        expect(jsonFromFile).to.have.all.keys(keys);
+
+        const expectedSloth = Object.assign({ id: slothId }, SLOTH);
+
+        expect(validateUUID(jsonFromFile.id, 4), 'Expected id to be a UUIDv4').to.be.true;
+        expect(jsonFromFile).to.eql(expectedSloth);
+      } else {
+        expect(jsonFromFile).to.exist;
+      }
+    });
+
+    it('should find an animal regardless of case given ILIKE', () => {
+      const fileIO: FileIO = new FileIO(databaseFolderDir);
+
+      const jsonFromFile: IRow | null = fileIO.findOne('animals', {
+        name: { ILIKE: 'Brown-throated sloth'.toLowerCase() },
+      });
+
+      if (jsonFromFile) {
+        const keys = Object.keys(SLOTH).concat('id');
+        expect(jsonFromFile).to.have.all.keys(keys);
+
+        const expectedSloth = Object.assign({ id: slothId }, SLOTH);
+
+        expect(validateUUID(jsonFromFile.id, 4), 'Expected id to be a UUIDv4').to.be.true;
+        expect(jsonFromFile).to.eql(expectedSloth);
+      } else {
+        expect(jsonFromFile).to.exist;
+      }
+    });
   });
 });
