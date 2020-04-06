@@ -1,0 +1,18 @@
+{
+  "dev": {
+    "driver": "pg",
+    "user": null,
+    "password": null,
+    "host": "localhost",
+    "database": "split_it",
+    "port": "5432"
+  },
+  "test": {
+    "driver": "pg",
+    "user": null,
+    "password": null,
+    "host": "localhost",
+    "database": "split_it_test",
+    "port": "5432"
+  }
+}
