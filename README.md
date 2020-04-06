@@ -23,7 +23,7 @@ An expense splitting CLI program.
 6. Build the program
   - This has to be run every time a change is made
 ```
-  $ npm run tsc
+  $ npx tsc
 ```
 7. Start the program
 - If you would like to do steps 3 and 4 together, you could run `npm run tsc_start` instead. This will ensure that you have the latest build, however, it will take longer for the program to start.
