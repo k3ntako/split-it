@@ -7,7 +7,8 @@
     "eslint": "eslint",
     "start": "node -r source-map-support/register ./dist/index.js",
     "tsc_start": "npx tsc && npm start",
-    "test": "mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts --file ./test/helpers/after.ts",
+    "test": "npm run dbCreate; npm run migrate; npm run test_mocha; npm run dbDrop",
+    "test_mocha": "mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts --file ./test/helpers/after.ts",
     "dbCreate": "psql -c 'CREATE DATABASE split_it'",
     "dbDrop": "psql -c 'DROP DATABASE split_it'",
     "migrate": "npx db-migrate up"
