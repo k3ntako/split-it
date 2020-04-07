@@ -13,7 +13,8 @@
       "chai",
       "inquirer",
       "mocha",
-      "node"
+      "node",
+      "pg"
     ]
   },
   "include": [

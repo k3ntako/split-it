@@ -7,34 +7,30 @@
     "eslint": "eslint",
     "start": "node -r source-map-support/register ./dist/index.js",
     "tsc_start": "npx tsc && npm start",
-    "test": "npm run dbCreate; npm run migrate; npm run test_mocha; npm run dbDrop",
-    "test_mocha": "mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts --file ./test/helpers/after.ts",
+    "test": "npm run dbDrop; npm run dbCreate; npm run migrate; npm run test_mocha; npm run dbDrop",
+    "test_mocha": "mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts",
     "dbCreate": "psql -c 'CREATE DATABASE split_it'",
     "dbDrop": "psql -c 'DROP DATABASE split_it'",
     "migrate": "npx db-migrate up"
   },
   "dependencies": {
     "@types/clear": "^0.1.0",
-    "@types/node": "^13.9.2",
-    "@types/pg": "^7.14.3",
-    "@types/uuid": "^7.0.2",
     "clear": "^0.1.0",
     "db-migrate": "^0.11.6",
     "db-migrate-pg": "^1.0.0",
     "inquirer": "^7.1.0",
     "pg": "^8.0.0",
-    "source-map-support": "^0.5.16",
-    "uuid": "^7.0.2"
+    "source-map-support": "^0.5.16"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/inquirer": "^6.5.0",
     "@types/mocha": "^7.0.2",
-    "@types/uuid-validate": "0.0.1",
+    "@types/node": "^13.11.0",
+    "@types/pg": "^7.14.3",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
     "chai": "^4.2.0",
-    "del": "^5.1.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-config-standard": "^14.1.1",
@@ -46,8 +42,7 @@
     "mocha": "^7.1.1",
     "prettier": "^2.0.2",
     "ts-node": "^8.8.1",
-    "typescript": "^3.8.3",
-    "uuid-validate": "0.0.3"
+    "typescript": "^3.8.3"
   },
   "author": "",
   "license": "ISC"

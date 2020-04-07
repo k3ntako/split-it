@@ -1,4 +1,4 @@
-import { IDatabaseIO, IRow } from '../FileIO';
+import { IPostgresIO } from '../PostgresIO';
 
 export interface IUser {
   id: string;
@@ -13,24 +13,22 @@ export default class User implements IUser {
     this.name = name;
   }
 
-  static create(name: string, io: IDatabaseIO): User {
+  static async create(name: string, postgresIO: IPostgresIO): Promise<IUser> {
     name = name && name.trim();
-    User.validate(name, io);
 
-    const user = io.writeRow('users', { name });
+    await User.validate(name, postgresIO);
+
+    const user = await postgresIO.createUser(name);
 
     return new User(user.id, name);
   }
 
-  static validate(name: string, io: IDatabaseIO){
-    name = name && name.trim();
+  static async validate(name: string, postgresIO: IPostgresIO){
     if (!name) {
       throw new Error('Name cannot be blank');
     }
 
-    const existingUser: IRow | null = io.findOne('users', { 
-      name: { ILIKE: name }
-    });
+    const existingUser: any = await postgresIO.findUserByName(name);
 
     if (existingUser) {
       throw new Error(`The name, ${name}, is already taken.`);
