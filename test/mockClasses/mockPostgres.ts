@@ -1,6 +1,7 @@
-import { IPostgresIO } from '../../src/PostgresIO';
+import { IDatabase } from '../../src/Postgres';
+import { IUser } from '../../src/models/UserTable';
 
-export default class MockPostgresIO implements IPostgresIO {
+export default class MockPostgres implements IDatabase {
   createUserArguments: string[];
   findUserByNameArguments: string[];
   constructor() {
@@ -8,7 +9,7 @@ export default class MockPostgresIO implements IPostgresIO {
     this.findUserByNameArguments = [];
   }
 
-  async createUser(name: string): Promise<any>{
+  async createUser(name: string): Promise<IUser>{
     this.createUserArguments.push(name);
 
     return {
@@ -17,7 +18,7 @@ export default class MockPostgresIO implements IPostgresIO {
     }
   }
 
-  async findUserByName(name: string): Promise<any> {
+  async findUserByName(name: string): Promise<IUser | null> {
     this.findUserByNameArguments.push(name);
 
     const id = this.createUserArguments.indexOf(name) + 1;

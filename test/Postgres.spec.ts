@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import PostgresIO from '../src/PostgresIO';
-import { Pool } from 'pg';
+import Postgres from '../src/Postgres';
+import { Pool, QueryResult } from 'pg';
 
 const pool = new Pool({
   host: 'localhost',
@@ -8,10 +8,10 @@ const pool = new Pool({
   port: 5432,
 });
 
-describe('PostgresIO', () => {
+describe('Postgres', () => {
   describe('createUser', () => {
     it('should save user to database', async () => {
-      const postgresIO = new PostgresIO;
+      const postgresIO = new Postgres;
       const name = 'FunUser';
 
       const user = await postgresIO.createUser(name);
@@ -21,14 +21,14 @@ describe('PostgresIO', () => {
         name,
       });
 
-      const userFromDB: any = await pool.query(`SELECT * FROM users WHERE name='${name}'`);
+      const userFromDB: QueryResult = await pool.query(`SELECT * FROM users WHERE name='${name}'`);
       expect(userFromDB.rows[0].name).to.equal(name);
     });
   });
 
   describe('findUserByName', () => {
     it('should save user to database', async () => {
-      const postgresIO = new PostgresIO;
+      const postgresIO = new Postgres;
       const name = 'FunUser';
 
       const user = await postgresIO.findUserByName(name);

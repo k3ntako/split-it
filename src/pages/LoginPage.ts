@@ -3,7 +3,6 @@ import { Answers } from "inquirer";
 import { IUserIO } from "../CLI";
 import { IPrompter } from "../Prompter";
 import SignUpPage from "./SignUpPage";
-import PostgresIO from "../PostgresIO";
 
 export default class LoginPage implements IPage {
   userIO: IUserIO;
@@ -20,7 +19,7 @@ export default class LoginPage implements IPage {
     const answer: Answers = await this.prompter.promptList('Who is this?', ['New Account']);
 
     if (answer.action === 'New Account') {
-      return new SignUpPage(this.userIO, this.prompter, new PostgresIO());
+      return new SignUpPage(this.userIO, this.prompter);
     }
 
     return null;

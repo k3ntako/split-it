@@ -1,18 +1,15 @@
 import IPage from "./IPage";
 import { Answers } from "inquirer";
-import User from "../models/User";
+import tables from '../models';
 import { IUserIO } from "../CLI";
 import { IPrompter } from "../Prompter";
-import { IPostgresIO } from "../PostgresIO";
 
 export default class SignUpPage implements IPage {
   userIO: IUserIO;
-  postgresIO: IPostgresIO;
   prompter: IPrompter;
 
-  constructor(userIO: IUserIO, prompter: IPrompter, postgresIO: IPostgresIO){
+  constructor(userIO: IUserIO, prompter: IPrompter){
     this.userIO = userIO;
-    this.postgresIO = postgresIO;
     this.prompter = prompter;
   }
 
@@ -26,7 +23,7 @@ export default class SignUpPage implements IPage {
         const nameAnswer: Answers = await this.prompter.promptInput('What\'s your name?');
         const name: string = nameAnswer.input;
 
-        await User.create(name, this.postgresIO);
+        await tables.userTable.create(name);
 
         isValid = true;
       } catch (error) {
