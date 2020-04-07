@@ -26,8 +26,8 @@ describe('Postgres', () => {
     it('should get config for specified environment', () => {
       const expected = {
         driver: "pg",
-        user: null,
-        password: null,
+        user: "test_user",
+        password: "",
         host: "localhost",
         database: "split_it_test",
         port: 5432
@@ -55,7 +55,7 @@ describe('Postgres', () => {
   });
 
   describe('findUserByName', () => {
-    it('should save user to database', async () => {
+    it('should find user from database', async () => {
       const name = 'FunUser';
 
       const user = await postgres.findUserByName(name);

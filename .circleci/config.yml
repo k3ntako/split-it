@@ -1,17 +1,38 @@
-version: 2.1
-orbs:
-  node: circleci/node@1.1.6
+version: 2
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test
+
 jobs:
-  build-and-test:
-    executor:
-      name: node/default
+  test:
+    docker:
+      - image: circleci/node:12
+        environment:
+          NODE_ENV: test
+          PGHOST: localhost
+          PGUSER: test_user
+          PGDATABASE: split_it_test
+      - image: circleci/postgres:11
+        environment:
+          NODE_ENV: test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: ""
+          POSTGRES_DB: split_it_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run: npm install
-            - run: npm test
-workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+      - restore_cache:
+          key: v1-deps-{{ checksum "package.json" }}
+      - run: sudo apt install postgresql-client
+      - run: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-deps-{{ checksum "package.json" }}
+      - run: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run: npm run dbMigrateTest
+      - run: NODE_ENV=test npm run test_mocha

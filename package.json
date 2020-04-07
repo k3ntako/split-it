@@ -10,7 +10,7 @@
     "test": "npm run dbDropTest; npm run dbCreateTest; npm run dbMigrateTest; NODE_ENV=test npm run test_mocha; npm run dbDropTest",
     "test_mocha": "mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts",
     "dbCreate": "psql -c 'CREATE DATABASE split_it'",
-    "dbCreateTest": "psql -c 'CREATE DATABASE split_it_test'",
+    "dbCreateTest": "psql -c 'CREATE DATABASE split_it_test' && psql -c 'CREATE USER test_user'",
     "dbDropTest": "psql -c 'DROP DATABASE split_it_test'",
     "dbMigrate": "npx db-migrate up -e production",
     "dbMigrateTest": "npx db-migrate up -e test"
