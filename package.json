@@ -7,11 +7,13 @@
     "eslint": "eslint",
     "start": "node -r source-map-support/register ./dist/index.js",
     "tsc_start": "npx tsc && npm start",
-    "test": "npm run dbDrop; npm run dbCreate; npm run migrate; npm run test_mocha; npm run dbDrop",
+    "test": "npm run dbDropTest; npm run dbCreateTest; npm run dbMigrateTest; NODE_ENV=test npm run test_mocha; npm run dbDropTest",
     "test_mocha": "mocha -r ts-node/register ./test/*.spec.ts ./test/**/*.spec.ts",
     "dbCreate": "psql -c 'CREATE DATABASE split_it'",
-    "dbDrop": "psql -c 'DROP DATABASE split_it'",
-    "migrate": "npx db-migrate up"
+    "dbCreateTest": "psql -c 'CREATE DATABASE split_it_test'",
+    "dbDropTest": "psql -c 'DROP DATABASE split_it_test'",
+    "dbMigrate": "npx db-migrate up -e production",
+    "dbMigrateTest": "npx db-migrate up -e test"
   },
   "dependencies": {
     "@types/clear": "^0.1.0",

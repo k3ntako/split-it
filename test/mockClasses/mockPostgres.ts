@@ -9,6 +9,17 @@ export default class MockPostgres implements IDatabase {
     this.findUserByNameArguments = [];
   }
 
+  getConfig(env: string): {}{
+    return {
+      driver: "mock_" + env,
+      user: null,
+      password: null,
+      host: "localhost",
+      database: "split_it_test",
+      port: "5432"
+    };
+  }
+
   async createUser(name: string): Promise<IUser>{
     this.createUserArguments.push(name);
 

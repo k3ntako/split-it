@@ -1,11 +1,14 @@
 {
-  "dev": {
+  "defaultEnv": {
+    "ENV": "NODE_ENV"
+  },
+  "production": {
     "driver": "pg",
     "user": null,
     "password": null,
     "host": "localhost",
     "database": "split_it",
-    "port": "5432"
+    "port": 5432
   },
   "test": {
     "driver": "pg",
@@ -13,6 +16,6 @@
     "password": null,
     "host": "localhost",
     "database": "split_it_test",
-    "port": "5432"
+    "port": 5432
   }
 }

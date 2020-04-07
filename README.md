@@ -18,7 +18,7 @@ An expense splitting CLI program.
 ```
 5. Run migrations
 ```
-  $ npm run migrate
+  $ npm run dbMigrate
 ```
 6. Build the program
   - This has to be run every time a change is made

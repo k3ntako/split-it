@@ -6,7 +6,7 @@ const mockPostgres = new MockPostgres()
 
 describe('UserTable model', () => {
   before(() => {
-    init(mockPostgres)
+    init(mockPostgres);
   });
 
   describe('create', () => {
