@@ -1,6 +1,6 @@
 import IPage from "./IPage";
 import { Answers } from "inquirer";
-import tables from '../models';
+import { userTable } from '../tables';
 import { IUserIO } from "../CLI";
 import { IPrompter } from "../Prompter";
 
@@ -23,7 +23,7 @@ export default class SignUpPage implements IPage {
         const nameAnswer: Answers = await this.prompter.promptInput('What\'s your name?');
         const name: string = nameAnswer.input;
 
-        await tables.userTable.create(name);
+        await userTable.create(name);
 
         isValid = true;
       } catch (error) {

@@ -8,6 +8,7 @@ export interface IUser {
 export interface IUserTable {
   database: IDatabase;
   create(name: string): Promise<IUser>;
+  findByName(name: string): Promise<IUser | null>
 }
 
 export default class UserTable implements IUserTable {
@@ -29,10 +30,14 @@ export default class UserTable implements IUserTable {
       throw new Error('Name cannot be blank');
     }
 
-    const existingUser: IUser | null = await this.database.findUserByName(name);
+    const existingUser: IUser | null = await this.findByName(name);
 
     if (existingUser) {
       throw new Error(`The name, ${name}, is already taken.`);
     }
+  }
+
+  async findByName(name: string): Promise<IUser | null> {
+    return await this.database.findUserByName(name);
   }
 }

@@ -2,9 +2,7 @@ import { expect } from 'chai';
 import MockCLI from './../mockClasses/mockCLI';
 import Prompter, { IPrompter } from '../../src/Prompter';
 import SignUpPage from '../../src/pages/SignUpPage';
-import MockPostgres from '../mockClasses/mockPostgres';
-import UserTable from '../../src/models/UserTable';
-import { init } from '../../src/models';
+import { userTable } from '../../src/tables';
 
 describe('SignUpPage', () => {
   it('should save user to database', async () => {
@@ -13,30 +11,31 @@ describe('SignUpPage', () => {
     mockCLI.promptMockAnswers = [{ input: 'K3ntako' }];
 
     const prompter: IPrompter = new Prompter(mockCLI);
-    const mockPostgres = new MockPostgres;
-    init(mockPostgres)
 
     const loginPage = new SignUpPage(mockCLI, prompter);
     await loginPage.display();
 
     expect(mockCLI.clearCallNum).to.equal(1);
-    expect(mockPostgres.createUserArguments[0]).to.eql('K3ntako');
+
+    const user = await userTable.findByName('K3ntako');
+
+    if (user) {
+      expect(user.name).to.equal('K3ntako');
+    } else {
+      expect.fail('Expected user to exist');
+    }
   });
 
   it('should continue to save user until they enter a valid name', async () => {
     // Fake calls that were already made
     // Acting as if an account with name, "K3ntako", was already created
-    const mockPostgres = new MockPostgres();
-    init(mockPostgres)
-
-    const userTable = new UserTable(mockPostgres);
-    userTable.create('K3ntako');
+    userTable.create('Kenny');
 
     // The fake user inputs
     const mockCLI: MockCLI = new MockCLI();
     mockCLI.promptMockAnswers = [
       { input: '' },
-      { input: 'K3ntako' },
+      { input: 'Kenny' },
       { input: 'New valid name' },
     ];
 
@@ -45,6 +44,7 @@ describe('SignUpPage', () => {
     const signUpPage = new SignUpPage(mockCLI, prompter);
     await signUpPage.display();
 
-    expect(mockPostgres.createUserArguments[1]).to.equal('New valid name');
+    const newValidName = await userTable.findByName('New valid name');
+    expect(newValidName).to.exist;
   });
 });

@@ -1,5 +1,5 @@
 import { Pool, QueryResult } from 'pg';
-import { IUser } from './models/UserTable';
+import { IUser } from './tables/UserTable';
 import fs from 'fs';
 
 interface IPoolConfig {
