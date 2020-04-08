@@ -40,7 +40,7 @@ describe('Postgres', () => {
 
   describe('createUser', () => {
     it('should save user to database', async () => {
-      const name = 'FunUser';
+      const name = 'Fun User';
 
       const user = await postgres.createUser(name);
 
@@ -56,13 +56,24 @@ describe('Postgres', () => {
 
   describe('findUserByName', () => {
     it('should find user from database', async () => {
-      const name = 'FunUser';
+      const name = 'Fun User';
 
       const user = await postgres.findUserByName(name);
 
       expect(user).to.eql({
         id: 1,
         name,
+      });
+    });
+
+    it('should find user from database regardless of case', async () => {
+      const name = 'fun user';
+
+      const user = await postgres.findUserByName(name);
+
+      expect(user).to.eql({
+        id: 1,
+        name: 'Fun User',
       });
     });
   });

@@ -19,6 +19,7 @@ export default class UserTable implements IUserTable {
 
   async create(name: string): Promise<IUser>{
     name = name && name.trim();
+    name = this.titleCase(name);
 
     await this.validate(name);
 
@@ -39,5 +40,9 @@ export default class UserTable implements IUserTable {
 
   async findByName(name: string): Promise<IUser | null> {
     return await this.database.findUserByName(name);
+  }
+
+  private titleCase(name: string): string {
+    return name.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ');
   }
 }
