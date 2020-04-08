@@ -40,40 +40,40 @@ describe('Postgres', () => {
 
   describe('createUser', () => {
     it('should save user to database', async () => {
-      const name = 'Fun User';
+      const firstName = 'Fun User';
 
-      const user = await postgres.createUser(name);
+      const user = await postgres.createUser(firstName);
 
       expect(user).to.eql({
         id: 1,
-        name,
+        first_name: firstName,
       });
 
-      const userFromDB: QueryResult = await postgres.pool.query(`SELECT * FROM users WHERE name='${name}'`);
-      expect(userFromDB.rows[0].name).to.equal(name);
+      const userFromDB: QueryResult = await postgres.pool.query(`SELECT * FROM users WHERE first_name='${firstName}'`);
+      expect(userFromDB.rows[0].first_name).to.equal(firstName);
     });
   });
 
   describe('findUserByName', () => {
     it('should find user from database', async () => {
-      const name = 'Fun User';
+      const firstName = 'Fun User';
 
-      const user = await postgres.findUserByName(name);
+      const user = await postgres.findUserByName(firstName);
 
       expect(user).to.eql({
         id: 1,
-        name,
+        first_name: firstName,
       });
     });
 
     it('should find user from database regardless of case', async () => {
-      const name = 'fun user';
+      const firstName = 'fun user';
 
-      const user = await postgres.findUserByName(name);
+      const user = await postgres.findUserByName(firstName);
 
       expect(user).to.eql({
         id: 1,
-        name: 'Fun User',
+        first_name: 'Fun User',
       });
     });
   });

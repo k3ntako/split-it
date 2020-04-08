@@ -2,13 +2,13 @@ import { IDatabase } from '../Postgres';
 
 export interface IUser {
   id: number;
-  name: string;
+  first_name: string;
 }
 
 export interface IUserTable {
   database: IDatabase;
-  create(name: string): Promise<IUser>;
-  findByName(name: string): Promise<IUser | null>
+  create(firstName: string): Promise<IUser>;
+  findByName(firstName: string): Promise<IUser | null>
 }
 
 export default class UserTable implements IUserTable {
@@ -17,32 +17,32 @@ export default class UserTable implements IUserTable {
     this.database = database;
   }
 
-  async create(name: string): Promise<IUser>{
-    name = name && name.trim();
-    name = this.titleCase(name);
+  async create(firstName: string): Promise<IUser>{
+    firstName = firstName && firstName.trim();
+    firstName = this.titleCase(firstName);
 
-    await this.validate(name);
+    await this.validate(firstName);
 
-    return await this.database.createUser(name);
+    return await this.database.createUser(firstName);
   }
 
-  async validate(name: string){
-    if (!name) {
+  async validate(firstName: string){
+    if (!firstName) {
       throw new Error('Name cannot be blank');
     }
 
-    const existingUser: IUser | null = await this.findByName(name);
+    const existingUser: IUser | null = await this.findByName(firstName);
 
     if (existingUser) {
-      throw new Error(`The name, ${name}, is already taken.`);
+      throw new Error(`The name, ${firstName}, is already taken.`);
     }
   }
 
-  async findByName(name: string): Promise<IUser | null> {
-    return await this.database.findUserByName(name);
+  async findByName(firstName: string): Promise<IUser | null> {
+    return await this.database.findUserByName(firstName);
   }
 
-  private titleCase(name: string): string {
-    return name.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ');
+  private titleCase(firstName: string): string {
+    return firstName.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ');
   }
 }
