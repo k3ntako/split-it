@@ -20,6 +20,7 @@ interface IPoolFileConfig {
 export interface IDatabase {
   createUser(name: string): Promise<IUser>;
   findUserByName(name: string): Promise<IUser | null>;
+  end(): Promise<void>;
 }
 
 export interface IPool extends Pool {
@@ -50,6 +51,8 @@ export default class Postgres implements IPostgres {
       database: config.database,
       port: config.port,
     });
+
+    this.end = this.end.bind(this);
   }
 
   getConfig(env: string): IPoolFileConfig {
@@ -70,5 +73,9 @@ export default class Postgres implements IPostgres {
   async findUserByName(name: string): Promise<IUser | null> {
     const result: QueryResult = await this.pool.query(`SELECT * FROM users WHERE name='${name}';`);
     return result.rows[0];
+  }
+
+  async end(): Promise<void> {
+    !this.pool.ended && await this.pool.end();
   }
 }

@@ -49,7 +49,6 @@ describe('UserTable model', () => {
       } else {
         expect.fail('Expected user to exist');
       }
-
     });
   });
 });

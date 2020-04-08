@@ -66,4 +66,12 @@ describe('Postgres', () => {
       });
     });
   });
+
+  describe('end', () => {
+    it('should end pool', async () => {
+      await postgres.end();
+
+      expect(postgres.pool.ended).to.be.true;
+    });
+  });
 });
