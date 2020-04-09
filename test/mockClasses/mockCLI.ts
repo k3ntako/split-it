@@ -1,10 +1,11 @@
 import { IUserIO } from '../../src/CLI';
-import { Answers, Question } from 'inquirer';
+import { Answers } from 'inquirer';
+import { IQuestionOptions } from '../../src/Prompter';
 
 export default class MockCLI implements IUserIO {
   printArguments: string[];
   clearCallNum: number;
-  promptArguments: Question[];
+  promptArguments: IQuestionOptions[];
   promptMockAnswers: Answers[];
   private promptMockAnswersIdx: number;
   constructor() {
@@ -23,7 +24,7 @@ export default class MockCLI implements IUserIO {
     this.clearCallNum++;
   }
 
-  async prompt(questions: Question[]): Promise<Answers>{
+  async prompt(questions: IQuestionOptions[]): Promise<Answers>{
     this.promptArguments = this.promptArguments.concat(questions);
 
     const returnAnswer = this.promptMockAnswers[this.promptMockAnswersIdx];

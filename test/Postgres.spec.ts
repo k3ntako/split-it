@@ -78,6 +78,18 @@ describe('Postgres', () => {
     });
   });
 
+  describe('getAllUsers', () => {
+    it('should find all users', async () => {
+      const users = await postgres.getAllUsers();
+      expect(users).to.have.lengthOf(1);
+
+      expect(users[0]).to.eql({
+        id: 1,
+        first_name: 'Fun User',
+      });
+    });
+  });
+
   describe('end', () => {
     it('should end pool', async () => {
       await postgres.end();

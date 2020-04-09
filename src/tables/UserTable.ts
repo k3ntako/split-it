@@ -8,7 +8,8 @@ export interface IUser {
 export interface IUserTable {
   database: IDatabase;
   create(firstName: string): Promise<IUser>;
-  findByName(firstName: string): Promise<IUser | null>
+  findByName(firstName: string): Promise<IUser | null>;
+  getAll(): Promise<IUser[]>;
 }
 
 export default class UserTable implements IUserTable {
@@ -44,5 +45,9 @@ export default class UserTable implements IUserTable {
 
   private titleCase(firstName: string): string {
     return firstName.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ');
+  }
+
+  async getAll(): Promise<IUser[]> {
+    return await this.database.getAllUsers();
   }
 }

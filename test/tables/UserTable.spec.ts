@@ -51,4 +51,12 @@ describe('UserTable model', () => {
       }
     });
   });
+
+  describe('getAll', () => {
+    it('should find user by name regardless of case', async () => {
+      const users = await userTable.getAll();
+      expect(users).to.have.lengthOf(7);
+      expect(users[0]).to.have.all.keys(['id', 'first_name']);
+    });
+  });
 });

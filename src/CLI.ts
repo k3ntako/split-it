@@ -1,11 +1,13 @@
-import { Answers, Question } from 'inquirer';
+import { IQuestionOptions } from "./Prompter";
+import { Answers } from "inquirer";
+
 const clear = require('clear');
 const inquirer = require('inquirer');
 
 export interface IUserIO {
   print(message: string): void;
   clear(): void;
-  prompt(questions: Question[]): Promise<Answers>;
+  prompt(questions: IQuestionOptions[]): Promise<Answers>;
 }
 
 export default class CLI implements IUserIO {
@@ -19,7 +21,7 @@ export default class CLI implements IUserIO {
     clear();
   }
 
-  async prompt(questions: Question[]): Promise<Answers>{
+  async prompt(questions: IQuestionOptions[]): Promise<Answers>{
     return await inquirer.prompt(questions);
   }
 }
