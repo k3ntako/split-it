@@ -3,13 +3,13 @@ import { userTable } from '../../src/tables';
 
 describe('UserTable model', () => {
   describe('create', () => {
-    it('should create a user', async () => {
-      await userTable.create('UserModelCreate1');
+    it('should create a user and save name as Title Case', async () => {
+      await userTable.create('User table model 1');
 
-      const user = await userTable.database.findUserByName('UserModelCreate1');
+      const user = await userTable.database.findUserByName('User table model 1');
 
       if (user) {
-        expect(user.name).to.equal('UserModelCreate1');
+        expect(user.first_name).to.equal('User Table Model 1');
       } else {
         expect.fail('Expected user to exist');
       }
@@ -30,22 +30,22 @@ describe('UserTable model', () => {
       await userTable.create('UserModelCreate2');
 
       try {
-        await userTable.validate('UserModelCreate2');
+        await userTable.validate('Usermodelcreate2');
         expect.fail('Expected UserTable.validate to throw error');
       } catch (error) {
-        expect(error.message).to.equal('The name, UserModelCreate2, is already taken.');
+        expect(error.message).to.equal('The name, Usermodelcreate2, is already taken.');
       }
     });
   });
 
   describe('findByName', () => {
-    it('should throw error given a blank name', async () => {
+    it('should find user by name regardless of case', async () => {
       const user = await userTable.findByName('UserModelCreate2');
-      expect(user).to.have.all.keys(['id', 'name']);
+      expect(user).to.have.all.keys(['id', 'first_name']);
 
       if (user){
         expect(user.id).to.be.a('number');
-        expect(user.name).to.equal('UserModelCreate2');
+        expect(user.first_name).to.equal('Usermodelcreate2');
       } else {
         expect.fail('Expected user to exist');
       }

@@ -20,7 +20,7 @@ describe('SignUpPage', () => {
     const user = await userTable.findByName('K3ntako');
 
     if (user) {
-      expect(user.name).to.equal('K3ntako');
+      expect(user.first_name).to.equal('K3ntako');
     } else {
       expect.fail('Expected user to exist');
     }

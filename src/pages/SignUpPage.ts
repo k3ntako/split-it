@@ -21,9 +21,9 @@ export default class SignUpPage implements IPage {
     while (!isValid) {
       try {
         const nameAnswer: Answers = await this.prompter.promptInput('What\'s your name?');
-        const name: string = nameAnswer.input;
+        const firstName: string = nameAnswer.input;
 
-        await userTable.create(name);
+        await userTable.create(firstName);
 
         isValid = true;
       } catch (error) {
