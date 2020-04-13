@@ -20,6 +20,7 @@ interface IPoolFileConfig {
 export interface IDatabase {
   createUser(firstName: string): Promise<IUser>;
   findUserByName(firstName: string): Promise<IUser | null>;
+  getAllUsers(): Promise<IUser[]>;
   end(): Promise<void>;
 }
 
@@ -73,6 +74,12 @@ export default class Postgres implements IPostgres {
   async findUserByName(firstName: string): Promise<IUser | null> {
     const result: QueryResult = await this.pool.query(`SELECT * FROM users WHERE first_name ILIKE '${firstName}';`);
     return result.rows[0];
+  }
+
+  async getAllUsers(): Promise<IUser[]> {
+    const result: QueryResult = await this.pool.query('SELECT * FROM users;');
+
+    return result.rows;
   }
 
   async end(): Promise<void> {

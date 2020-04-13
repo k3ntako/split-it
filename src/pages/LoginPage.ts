@@ -3,6 +3,8 @@ import { Answers } from "inquirer";
 import { IUserIO } from "../CLI";
 import { IPrompter } from "../Prompter";
 import SignUpPage from "./SignUpPage";
+import { userTable } from "../tables";
+import Separator from "inquirer/lib/objects/separator";
 
 export default class LoginPage implements IPage {
   userIO: IUserIO;
@@ -16,7 +18,11 @@ export default class LoginPage implements IPage {
   async display(): Promise<IPage | null> {
     this.userIO.clear();
 
-    const answer: Answers = await this.prompter.promptList('Who is this?', ['New Account']);
+    const users = await userTable.getAll();
+    const names = users.map(user => user.first_name);
+    const choices = ['New Account', new Separator].concat(names);
+
+    const answer: Answers = await this.prompter.promptList('Who is this?', choices);
 
     if (answer.action === 'New Account') {
       return new SignUpPage(this.userIO, this.prompter);
