@@ -3,17 +3,18 @@ import { Answers } from "inquirer";
 import { userTable } from '../tables';
 import { IUserIO } from "../CLI";
 import { IPrompter } from "../Prompter";
+import MenuPage from "./MenuPage";
 
 export default class SignUpPage implements IPage {
   userIO: IUserIO;
   prompter: IPrompter;
 
-  constructor(userIO: IUserIO, prompter: IPrompter){
+  constructor(userIO: IUserIO, prompter: IPrompter) {
     this.userIO = userIO;
     this.prompter = prompter;
   }
 
-  async display(): Promise<null> {
+  async display(): Promise<IPage> {
     this.userIO.clear();
 
     let isValid: boolean = false;
@@ -32,6 +33,6 @@ export default class SignUpPage implements IPage {
       }
     }
 
-    return null;
+    return new MenuPage(this.userIO, this.prompter);
   }
 }

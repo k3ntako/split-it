@@ -43,7 +43,7 @@ describe('UserTable model', () => {
       const user = await userTable.findByName('UserModelCreate2');
       expect(user).to.have.all.keys(['id', 'first_name']);
 
-      if (user){
+      if (user) {
         expect(user.id).to.be.a('number');
         expect(user.first_name).to.equal('Usermodelcreate2');
       } else {
@@ -55,7 +55,7 @@ describe('UserTable model', () => {
   describe('getAll', () => {
     it('should find user by name regardless of case', async () => {
       const users = await userTable.getAll();
-      expect(users).to.have.lengthOf(7);
+      expect(users).to.have.lengthOf(8);
       expect(users[0]).to.have.all.keys(['id', 'first_name']);
     });
   });

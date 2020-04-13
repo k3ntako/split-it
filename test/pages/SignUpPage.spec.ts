@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import MockCLI from './../mockClasses/mockCLI';
 import Prompter, { IPrompter } from '../../src/Prompter';
 import SignUpPage from '../../src/pages/SignUpPage';
+import MenuPage from '../../src/pages/MenuPage';
 import { userTable } from '../../src/tables';
 
 describe('SignUpPage', () => {
@@ -33,11 +34,7 @@ describe('SignUpPage', () => {
 
     // The fake user inputs
     const mockCLI: MockCLI = new MockCLI();
-    mockCLI.promptMockAnswers = [
-      { input: '' },
-      { input: 'Kenny' },
-      { input: 'New valid name' },
-    ];
+    mockCLI.promptMockAnswers = [{ input: '' }, { input: 'Kenny' }, { input: 'New valid name' }];
 
     const prompter: IPrompter = new Prompter(mockCLI);
 
@@ -46,5 +43,17 @@ describe('SignUpPage', () => {
 
     const newValidName = await userTable.findByName('New valid name');
     expect(newValidName).to.exist;
+  });
+
+  it('should return MenuPage if the user logs in', async () => {
+    const mockCLI: MockCLI = new MockCLI();
+    mockCLI.promptMockAnswers = [{ input: 'Rachel' }];
+
+    const prompter: IPrompter = new Prompter(mockCLI);
+
+    const loginPage = new SignUpPage(mockCLI, prompter);
+    const nextPage = await loginPage.display();
+
+    expect(nextPage).to.be.an.instanceOf(MenuPage);
   });
 });
