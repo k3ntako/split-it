@@ -2,6 +2,16 @@ import IPage from './IPage';
 import { IUserIO } from '../CLI';
 import { IPrompter } from '../Prompter';
 import { Answers } from 'inquirer';
+import AddTransactionPage from './AddTransactionPage';
+
+interface INextPageOptions {
+  [key: string]: new () => IPage;
+  'Add transaction': new () => IPage;
+}
+
+const nextPageOptions: INextPageOptions = {
+  'Add transaction': AddTransactionPage,
+}
 
 export default class MenuPage implements IPage {
   userIO: IUserIO;
@@ -12,15 +22,14 @@ export default class MenuPage implements IPage {
     this.prompter = prompter;
   }
 
-
-  async display(): Promise<IPage | null> {
+  async display(): Promise<IPage> {
     this.userIO.clear();
 
-    const choices = ['New transaction'];
+    const choices: string[] = Object.keys(nextPageOptions);
 
     const answer: Answers = await this.prompter.promptList('Main menu:', choices);
-    console.log(answer);
+    const action: string = answer.action;
 
-    return null;
+    return new nextPageOptions[action];
   }
 }
