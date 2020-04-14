@@ -6,12 +6,17 @@ describe('UserTable model', () => {
   const postgres = new Postgres;
 
   before(async () => {
-    await postgres.pool.query('TRUNCATE TABLE users;');
+    await postgres.query('DELETE FROM transaction_people;');
+    await postgres.query('DELETE FROM transactions;');
+    await postgres.query('DELETE FROM users;');
   });
 
   after(async () => {
-    await postgres.pool.query('TRUNCATE TABLE users;');
-    !postgres.pool.ended && await postgres.pool.end();
+    await postgres.query('DELETE FROM transaction_people;');
+    await postgres.query('DELETE FROM transactions;');
+    await postgres.query('DELETE FROM users;');
+
+    await postgres.end();
   });
 
   describe('create', () => {
