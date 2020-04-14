@@ -1,7 +1,19 @@
 import { expect } from 'chai';
 import { userTable } from '../../src/tables';
+import Postgres from '../../src/Postgres';
 
 describe('UserTable model', () => {
+  const postgres = new Postgres;
+
+  before(async () => {
+    await postgres.pool.query('TRUNCATE TABLE users;');
+  });
+
+  after(async () => {
+    await postgres.pool.query('TRUNCATE TABLE users;');
+    !postgres.pool.ended && await postgres.pool.end();
+  });
+
   describe('create', () => {
     it('should create a user and save name as Title Case', async () => {
       await userTable.create('User table model 1');
@@ -55,7 +67,7 @@ describe('UserTable model', () => {
   describe('getAll', () => {
     it('should find user by name regardless of case', async () => {
       const users = await userTable.getAll();
-      expect(users).to.have.lengthOf(8);
+      expect(users).to.have.lengthOf(2);
       expect(users[0]).to.have.all.keys(['id', 'first_name']);
     });
   });

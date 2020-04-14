@@ -10,7 +10,10 @@ describe('MenuPage', () => {
     mockCLI.promptMockAnswers = [{ action: 'Add transaction' }];
     const prompter: IPrompter = new Prompter(mockCLI);
 
-    const menuPage = new MenuPage(mockCLI, prompter);
+    const menuPage = new MenuPage(mockCLI, prompter, {
+      id: 1,
+      first_name: 'Bob'
+    });
     await menuPage.display();
 
     const arg: IQuestionOptions = mockCLI.promptArguments[0];
@@ -25,7 +28,10 @@ describe('MenuPage', () => {
     mockCLI.promptMockAnswers = [{ action: 'Add transaction' }];
     const prompter: IPrompter = new Prompter(mockCLI);
 
-    const menuPage = new MenuPage(mockCLI, prompter);
+    const menuPage = new MenuPage(mockCLI, prompter, {
+      id: 1,
+      first_name: 'Bob'
+    });
     const nextPage = await menuPage.display();
 
     expect(nextPage).to.be.an.instanceOf(AddTransactionPage);

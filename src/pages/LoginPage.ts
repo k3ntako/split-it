@@ -6,6 +6,7 @@ import SignUpPage from "./SignUpPage";
 import { userTable } from "../tables";
 import Separator from "inquirer/lib/objects/separator";
 import MenuPage from "./MenuPage";
+import { IUser } from "../tables/UserTable";
 
 export default class LoginPage implements IPage {
   userIO: IUserIO;
@@ -29,6 +30,12 @@ export default class LoginPage implements IPage {
       return new SignUpPage(this.userIO, this.prompter);
     }
 
-    return new MenuPage(this.userIO, this.prompter);
+    const user: IUser | undefined = users.find(u => u.first_name === answer.action);
+
+    if (!user) {
+      throw new Error(`User, ${answer.action}, was not found`);
+    }
+
+    return new MenuPage(this.userIO, this.prompter, user);
   }
 };

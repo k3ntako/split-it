@@ -3,10 +3,11 @@ import { IUserIO } from '../CLI';
 import { IPrompter } from '../Prompter';
 import { Answers } from 'inquirer';
 import AddTransactionPage from './AddTransactionPage';
+import { IUser } from '../tables/UserTable';
 
 interface INextPageOptions {
-  [key: string]: new () => IPage;
-  'Add transaction': new () => IPage;
+  [key: string]: new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage;
+  'Add transaction': new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage;
 }
 
 const nextPageOptions: INextPageOptions = {
@@ -16,10 +17,12 @@ const nextPageOptions: INextPageOptions = {
 export default class MenuPage implements IPage {
   userIO: IUserIO;
   prompter: IPrompter;
+  user: IUser;
 
-  constructor(userIO: IUserIO, prompter: IPrompter) {
+  constructor(userIO: IUserIO, prompter: IPrompter, user: IUser) {
     this.userIO = userIO;
     this.prompter = prompter;
+    this.user = user;
   }
 
   async display(): Promise<IPage> {
@@ -30,6 +33,6 @@ export default class MenuPage implements IPage {
     const answer: Answers = await this.prompter.promptList('Main menu:', choices);
     const action: string = answer.action;
 
-    return new nextPageOptions[action];
+    return new nextPageOptions[action](this.userIO, this.prompter, this.user);
   }
 }

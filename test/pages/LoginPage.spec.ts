@@ -6,10 +6,23 @@ import MockCLI from './../mockClasses/mockCLI';
 import Prompter, { IPrompter, IQuestionOptions } from '../../src/Prompter';
 import { userTable } from '../../src/tables';
 import Separator from 'inquirer/lib/objects/separator';
+import Postgres from '../../src/Postgres';
 
 describe('LoginPage', () => {
+  const postgres = new Postgres;
+
+  before(async () => {
+    await postgres.pool.query('TRUNCATE TABLE users;');
+  });
+
+  after(async () => {
+    await postgres.pool.query('TRUNCATE TABLE users;');
+    !postgres.pool.ended && await postgres.pool.end();
+  });
+
   it('should ask user if they would like to create a new account', async () => {
     const mockCLI: MockCLI = new MockCLI();
+    mockCLI.promptMockAnswers = [{ action: 'New Account' }];
 
     const prompter: IPrompter = new Prompter(mockCLI);
 
@@ -46,6 +59,7 @@ describe('LoginPage', () => {
 
   it('should show list of users to login', async () => {
     const mockCLI: MockCLI = new MockCLI();
+    mockCLI.promptMockAnswers = [{ action: 'New Account' }];
     const prompter: IPrompter = new Prompter(mockCLI);
 
     await userTable.create('Bjorn');
