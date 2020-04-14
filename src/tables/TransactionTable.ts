@@ -26,10 +26,11 @@ export default class TransactionTable implements ITransactionTable {
   }
 
   async create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction> {
-    const tranaction = await this.database.createTransaction(name, date, cost);
-    await this.database.createTransactionPerson(tranaction.id, lenderId, cost / 2);
-    await this.database.createTransactionPerson(tranaction.id, borrowerId, -cost / 2);
+    const transaction = await this.database.createTransaction(name, date, cost);
 
-    return tranaction;
+    await this.database.createTransactionPerson(transaction.id, lenderId, cost / 2);
+    await this.database.createTransactionPerson(transaction.id, borrowerId, -cost / 2);
+
+    return transaction;
   }
 }
