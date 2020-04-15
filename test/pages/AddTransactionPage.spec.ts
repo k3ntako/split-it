@@ -7,6 +7,7 @@ import Postgres from '../../src/Postgres';
 import { userTable, transactionTable } from '../../src/tables';
 import { IUser } from '../../src/tables/UserTable';
 import { ITransaction } from '../../src/tables/TransactionTable';
+import chalk from 'chalk';
 
 describe('AddTransactionPage', () => {
   const postgres = new Postgres;
@@ -38,6 +39,21 @@ describe('AddTransactionPage', () => {
     addTransactionPage = new AddTransactionPage(mockCLI, prompter, activeUser);
   });
 
+  it('should clear screen prior to each question', async () => {
+    await addTransactionPage.display();
+
+    expect(mockCLI.clearCallNum).to.equal(mockCLI.promptMockAnswers.length + 1);
+  });
+
+  it('should display page title at top prior to each question', async () => {
+    await addTransactionPage.display();
+
+    const expectedTitle: string = chalk.bold('Add a Transaction\n');
+
+    const diplayTitleArgs = mockCLI.printArguments.filter(str => str === expectedTitle);
+    expect(diplayTitleArgs.length).to.equal(mockCLI.promptMockAnswers.length + 1);
+  });
+
   it('should ask user who else was involved in the transaction', async () => {
     await addTransactionPage.display();
 
@@ -52,7 +68,7 @@ describe('AddTransactionPage', () => {
 
     const nameArg: IQuestionOptions = mockCLI.promptArguments[1];
     expect(nameArg.type).to.equal('input');
-    expect(nameArg.message).to.equal('What would you like to name this transaction?');
+    expect(nameArg.message).to.equal('Name the transaction');
   });
 
   it('should ask user for the transaction date', async () => {
@@ -186,5 +202,4 @@ describe('AddTransactionPage', () => {
     const nextPage = await addTransactionPage.display();
     expect(nextPage).to.be.an.instanceOf(MenuPage);
   });
-
 });

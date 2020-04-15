@@ -16,6 +16,7 @@
     "dbMigrateTest": "npx db-migrate up -e test"
   },
   "dependencies": {
+    "chalk": "^4.0.0",
     "clear": "^0.1.0",
     "db-migrate": "^0.11.6",
     "db-migrate-pg": "^1.0.0",

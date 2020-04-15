@@ -5,6 +5,7 @@ import { IUserIO } from '../CLI';
 import { Answers } from 'inquirer';
 import { userTable, transactionTable } from '../tables';
 import { IUser } from '../tables/UserTable';
+import chalk from 'chalk';
 
 export default class AddTransactionPage implements IPage {
   userIO: IUserIO;
@@ -18,29 +19,17 @@ export default class AddTransactionPage implements IPage {
   }
 
   async display(): Promise<IPage> {
-    this.userIO.clear();
-    const users: IUser[] = await userTable.getAll();
-
-    this.userIO.clear();
-    const otherUser: IUser | undefined = await this.getUser(users);
+    this.clearAndDisplayTitle();
+    const otherUser: IUser | undefined = await this.getUser();
 
     if (!otherUser) {
       throw Error('The other user cannot be undefined.')
     }
 
-    let name: string = '';
-    while (!name || !name.trim()) {
-      name = await this.getName();
-    }
-
+    const name: string = await this.getName();
     const date: Date = await this.getDate();
-
     const userPaid: boolean = await this.getUserPaid();
-
-    let cost: number = NaN;
-    while (isNaN(cost) || cost <= 0 || (cost * 100 % 1)) {
-      cost = await this.getCost();
-    }
+    const cost: number = await this.getCost();
 
     const lender: IUser = userPaid ? this.user : otherUser;
     const borrower: IUser = userPaid ? otherUser : this.user;
@@ -50,7 +39,16 @@ export default class AddTransactionPage implements IPage {
     return new MenuPage(this.userIO, this.prompter, this.user);
   }
 
-  private async getUser(users: IUser[]): Promise<IUser | undefined> {
+  private clearAndDisplayTitle(): void {
+    this.userIO.clear();
+    this.userIO.print(chalk.bold('Add a Transaction\n'));
+  }
+
+  private async getUser(): Promise<IUser | undefined> {
+    this.clearAndDisplayTitle();
+
+    const users: IUser[] = await userTable.getAll();
+
     const choices: string[] = users.reduce((acc: string[], user: IUser) => {
       if (user.first_name !== this.user.first_name) {
         return acc.concat(user.first_name);
@@ -63,22 +61,40 @@ export default class AddTransactionPage implements IPage {
   }
 
   private async getName(): Promise<string> {
-    const answer: Answers = await this.prompter.promptInput('What would you like to name this transaction?');
-    return answer.input;
+    this.clearAndDisplayTitle();
+
+    let name: string = '';
+    while (!name || !name.trim()) {
+      const answer: Answers = await this.prompter.promptInput('Name the transaction');
+      name = answer.input;
+    }
+
+    return name;
   }
 
   private async getDate(): Promise<Date> {
+    this.clearAndDisplayTitle();
+
     const answer: Answers = await this.prompter.promptDate('When was the transaction?');
     return answer.date;
   }
 
   private async getUserPaid(): Promise<boolean> {
+    this.clearAndDisplayTitle();
+
     const answer: Answers = await this.prompter.promptConfirm('Did you pay for this?');
     return answer.confirmation;
   }
 
   private async getCost(): Promise<number> {
-    const answer: Answers = await this.prompter.promptNumber('How much did it cost?');
-    return answer.number;
+    this.clearAndDisplayTitle();
+
+    let cost: number = NaN;
+    while (isNaN(cost) || cost <= 0 || (cost * 100 % 1)) {
+      const answer: Answers = await this.prompter.promptNumber('How much did it cost?');
+      cost = answer.number;
+    }
+
+    return cost;
   }
 }
