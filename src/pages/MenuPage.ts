@@ -11,19 +11,19 @@ interface INextPageOptions {
   'Add transaction': new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage;
 }
 
-const nextPageOptions: INextPageOptions = {
-  'Add transaction': AddTransactionPage,
-}
-
 export default class MenuPage implements IPage {
   userIO: IUserIO;
   prompter: IPrompter;
   user: IUser;
+  private nextPageOptions: INextPageOptions;
 
   constructor(userIO: IUserIO, prompter: IPrompter, user: IUser) {
     this.userIO = userIO;
     this.prompter = prompter;
     this.user = user;
+    this.nextPageOptions = {
+      'Add transaction': AddTransactionPage,
+    }
   }
 
   async display(): Promise<IPage | null> {
@@ -33,7 +33,7 @@ export default class MenuPage implements IPage {
       new Separator(),
       'Exit',
     ];
-    let choices: (string | Separator)[] = Object.keys(nextPageOptions)
+    let choices: (string | Separator)[] = Object.keys(this.nextPageOptions)
     choices = choices.concat(exitChoices);
 
     const answer: Answers = await this.prompter.promptList('Main menu:', choices);
@@ -43,6 +43,8 @@ export default class MenuPage implements IPage {
       return null;
     }
 
-    return new nextPageOptions[action](this.userIO, this.prompter, this.user);
+    const nextPage: new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage = this.nextPageOptions[action];
+
+    return new nextPage(this.userIO, this.prompter, this.user);
   }
 }

@@ -1,4 +1,5 @@
 import IPage from './IPage';
+import MenuPage from './MenuPage';
 import { IPrompter } from '../Prompter';
 import { IUserIO } from '../CLI';
 import { Answers } from 'inquirer';
@@ -16,7 +17,7 @@ export default class AddTransactionPage implements IPage {
     this.user = user;
   }
 
-  async display(): Promise<IPage | null> {
+  async display(): Promise<IPage> {
     this.userIO.clear();
     const users: IUser[] = await userTable.getAll();
 
@@ -46,7 +47,7 @@ export default class AddTransactionPage implements IPage {
 
     await transactionTable.create(lender.id, borrower.id, name, date, cost);
 
-    return null;
+    return new MenuPage(this.userIO, this.prompter, this.user);
   }
 
   private async getUser(users: IUser[]): Promise<IUser | undefined> {

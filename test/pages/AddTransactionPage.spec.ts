@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import AddTransactionPage from '../../src/pages/AddTransactionPage';
+import MenuPage from '../../src/pages/MenuPage';
 import MockCLI from '../mockClasses/mockCLI';
 import Prompter, { IPrompter, IQuestionOptions } from '../../src/Prompter';
 import Postgres from '../../src/Postgres';
@@ -180,4 +181,10 @@ describe('AddTransactionPage', () => {
       transactionTable.create = originalCreate; // restore original method
     }
   });
+
+  it('should return the MenuPage as the next page', async () => {
+    const nextPage = await addTransactionPage.display();
+    expect(nextPage).to.be.an.instanceOf(MenuPage);
+  });
+
 });
