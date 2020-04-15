@@ -24,7 +24,7 @@ export interface IDatabase {
   findUserByName(firstName: string): Promise<IUser | null>;
   getAllUsers(): Promise<IUser[]>;
   createTransaction(name: string, date: Date, cost: number): Promise<ITransaction>;
-  createTransactionPerson(transactionId: number, userId: number, amountOwed: number): Promise<ITransactionPerson>;
+  createTransactionPerson(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionPerson>;
   end(): Promise<void>;
 }
 
@@ -115,11 +115,11 @@ export default class Postgres implements IPostgres {
     return transaction;
   }
 
-  async createTransactionPerson(transactionId: number, userId: number, amountOwed: number): Promise<ITransactionPerson> {
+  async createTransactionPerson(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionPerson> {
     const result: QueryResult = await this.query(
       'INSERT INTO transaction_people ' +
-      '(transaction_id, user_id, amount_owed) ' +
-      `VALUES(${transactionId}, ${userId}, ${amountOwed}) ` +
+      '(transaction_id, lender_id, borrower_id, amount_owed) ' +
+      `VALUES(${transactionId}, ${lenderId}, ${borrowerId}, ${amountOwed}) ` +
       'RETURNING *;'
     );
 

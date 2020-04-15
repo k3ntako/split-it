@@ -34,24 +34,15 @@ describe('UserTable model', () => {
       expect(transaction).to.have.all.keys(['id', 'name', 'date', 'cost']);
 
       const queryResult: QueryResult = await postgres.query('SELECT * FROM transaction_people;');
-      const transactionPeople: ITransactionPerson[] = queryResult.rows;
+      const transactionPerson: ITransactionPerson = queryResult.rows[0];
 
-      expect(transactionPeople).to.have.lengthOf(2);
-
-      const lenderTransactionPerson = transactionPeople.find(tp => tp.user_id === user1.id);
-      if (lenderTransactionPerson) {
-        expect(lenderTransactionPerson.transaction_id).to.equal(transaction.id);
-        expect(Number(lenderTransactionPerson.amount_owed)).to.equal(transaction.cost / 2);
+      if (transactionPerson) {
+        expect(transactionPerson.transaction_id).to.equal(transaction.id);
+        expect(transactionPerson.lender_id).to.equal(user1.id);
+        expect(transactionPerson.borrower_id).to.equal(user2.id);
+        expect(Number(transactionPerson.amount_owed)).to.equal(transaction.cost / 2);
       } else {
-        expect.fail('Expected lender transaction person to exist');
-      }
-
-      const borrowerTransactionPerson = transactionPeople.find(tp => tp.user_id === user2.id);
-      if (borrowerTransactionPerson) {
-        expect(borrowerTransactionPerson.transaction_id).to.equal(transaction.id);
-        expect(Number(borrowerTransactionPerson.amount_owed)).to.equal(-1 * transaction.cost / 2);
-      } else {
-        expect.fail('Expected borrower transaction person to exist');
+        expect.fail('Expected transaction person to exist');
       }
     });
   });

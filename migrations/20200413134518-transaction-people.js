@@ -29,12 +29,25 @@ exports.up = function (db) {
         mapping: 'id',
       },
     },
-    user_id: {
+    lender_id: {
       type: 'int',
       primaryKey: true,
       notNull: true,
       foreignKey: {
-        name: 'user_id_fk',
+        name: 'lender_id_fk',
+        table: 'users',
+        rules: {
+          onDelete: 'CASCADE',
+        },
+        mapping: 'id',
+      },
+    },
+    borrower_id: {
+      type: 'int',
+      primaryKey: true,
+      notNull: true,
+      foreignKey: {
+        name: 'borrower_id_fk',
         table: 'users',
         rules: {
           onDelete: 'CASCADE',
