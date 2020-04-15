@@ -31,13 +31,11 @@ describe('UserTable model', () => {
         expect.fail('Expected user to exist');
       }
     });
-  });
 
-  describe('validate', () => {
     it('should throw error given a blank name', async () => {
       try {
-        await userTable.validate('');
-        expect.fail('Expected UserTable.validate to throw error');
+        await userTable.create('');
+        expect.fail('Expected UserTable.create to throw error');
       } catch (error) {
         expect(error.message).to.equal('Name cannot be blank');
       }
@@ -47,8 +45,8 @@ describe('UserTable model', () => {
       await userTable.create('UserModelCreate2');
 
       try {
-        await userTable.validate('Usermodelcreate2');
-        expect.fail('Expected UserTable.validate to throw error');
+        await userTable.create('Usermodelcreate2');
+        expect.fail('Expected UserTable.create to throw error');
       } catch (error) {
         expect(error.message).to.equal('The name, Usermodelcreate2, is already taken.');
       }

@@ -14,11 +14,11 @@ export interface IUserTable {
 
 export default class UserTable implements IUserTable {
   database: IDatabase;
-  constructor(database: IDatabase){
+  constructor(database: IDatabase) {
     this.database = database;
   }
 
-  async create(firstName: string): Promise<IUser>{
+  async create(firstName: string): Promise<IUser> {
     firstName = firstName && firstName.trim();
     firstName = this.titleCase(firstName);
 
@@ -27,7 +27,7 @@ export default class UserTable implements IUserTable {
     return await this.database.createUser(firstName);
   }
 
-  async validate(firstName: string){
+  private async validate(firstName: string) {
     if (!firstName) {
       throw new Error('Name cannot be blank');
     }
