@@ -27,17 +27,19 @@ export default class AddTransactionPage implements IPage {
       throw Error('The other user cannot be undefined.')
     }
 
-    this.userIO.clear();
-    const name: string = await this.getName();
+    let name: string = '';
+    while (!name || !name.trim()) {
+      name = await this.getName();
+    }
 
-    this.userIO.clear();
     const date: Date = await this.getDate();
 
-    this.userIO.clear();
     const userPaid: boolean = await this.getUserPaid();
 
-    this.userIO.clear();
-    const cost: number = await this.getCost();
+    let cost: number = NaN;
+    while (isNaN(cost) || cost <= 0 || (cost * 100 % 1)) {
+      cost = await this.getCost();
+    }
 
     const lender: IUser = userPaid ? this.user : otherUser;
     const borrower: IUser = userPaid ? otherUser : this.user;

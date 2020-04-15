@@ -124,4 +124,60 @@ describe('AddTransactionPage', () => {
       transactionTable.create = originalCreate; // restore original method
     }
   });
+
+  it('should continue to ask for a name until the input is not blank', async () => {
+    const originalCreate = transactionTable.create; // save original method
+
+    mockCLI.promptMockAnswers = [{ action: 'Olga' }, { input: '' }, { input: ' ' }, { input: 'Expensive lunch' }, { date: new Date() }, { confirmation: false }, { number: 100 }];
+    const prompter: IPrompter = new Prompter(mockCLI);
+
+    addTransactionPage = new AddTransactionPage(mockCLI, prompter, activeUser);
+
+    try {
+      // mock method
+      transactionTable.create = async (_lenderId: number, _borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction> => {
+        expect(name).to.equal('Expensive lunch');
+        return { id: 0, name, cost, date };
+      };
+
+      await addTransactionPage.display();
+
+    } catch (error) {
+      throw error;
+    } finally {
+      transactionTable.create = originalCreate; // restore original method
+    }
+  });
+
+  it('should continue cost is a positive number with no more than two decimal points', async () => {
+    const originalCreate = transactionTable.create; // save original method
+
+    mockCLI.promptMockAnswers = [
+      { action: 'Olga' },
+      { input: 'Expensive lunch' },
+      { date: new Date() },
+      { confirmation: false },
+      { number: -1 },
+      { number: 0 },
+      { number: 10.102 },
+      { number: 100.15 }
+    ];
+    const prompter: IPrompter = new Prompter(mockCLI);
+
+    addTransactionPage = new AddTransactionPage(mockCLI, prompter, activeUser);
+
+    try {
+      // mock method
+      transactionTable.create = async (_lenderId: number, _borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction> => {
+        expect(cost).to.equal(100.15);
+        return { id: 0, name, cost, date };
+      };
+
+      await addTransactionPage.display();
+    } catch (error) {
+      throw error;
+    } finally {
+      transactionTable.create = originalCreate; // restore original method
+    }
+  });
 });
