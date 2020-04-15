@@ -69,7 +69,7 @@ export default class Postgres implements IPostgres {
       return await this.pool.query(sql);
     } catch (error) {
       error.message += `. Failed command: ${sql}`;
-      throw new Error(error);
+      throw error;
     }
   }
 
