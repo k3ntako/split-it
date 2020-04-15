@@ -1,7 +1,7 @@
 import { Pool, QueryResult } from 'pg';
 import { IUser } from './tables/UserTable';
 import fs from 'fs';
-import { ITransaction, ITransactionPerson } from './tables/TransactionTable';
+import { ITransaction, ITransactionUser } from './tables/TransactionTable';
 
 interface IPoolConfig {
   host: string;
@@ -24,7 +24,7 @@ export interface IDatabase {
   findUserByName(firstName: string): Promise<IUser | null>;
   getAllUsers(): Promise<IUser[]>;
   createTransaction(name: string, date: Date, cost: number): Promise<ITransaction>;
-  createTransactionPerson(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionPerson>;
+  createTransactionUser(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionUser>;
   end(): Promise<void>;
 }
 
@@ -115,18 +115,18 @@ export default class Postgres implements IPostgres {
     return transaction;
   }
 
-  async createTransactionPerson(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionPerson> {
+  async createTransactionUser(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionUser> {
     const result: QueryResult = await this.query(
-      'INSERT INTO transaction_people ' +
+      'INSERT INTO transaction_users ' +
       '(transaction_id, lender_id, borrower_id, amount_owed) ' +
       `VALUES(${transactionId}, ${lenderId}, ${borrowerId}, ${amountOwed}) ` +
       'RETURNING *;'
     );
 
-    const transactionPerson: ITransactionPerson = result.rows[0];
-    transactionPerson.amount_owed = Number(transactionPerson.amount_owed); // pg does cannot safely convert decimal to JS number
+    const transactionUser: ITransactionUser = result.rows[0];
+    transactionUser.amount_owed = Number(transactionUser.amount_owed); // pg does cannot safely convert decimal to JS number
 
-    return transactionPerson;
+    return transactionUser;
   }
 
   async end(): Promise<void> {

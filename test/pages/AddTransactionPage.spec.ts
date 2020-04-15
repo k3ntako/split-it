@@ -12,7 +12,7 @@ describe('AddTransactionPage', () => {
   let activeUser: IUser, otherUser: IUser, addTransactionPage: AddTransactionPage, mockCLI: MockCLI;
 
   before(async () => {
-    await postgres.query('DELETE FROM transaction_people;');
+    await postgres.query('DELETE FROM transaction_users;');
     await postgres.query('DELETE FROM transactions;');
     await postgres.query('DELETE FROM users;');
 
@@ -22,7 +22,7 @@ describe('AddTransactionPage', () => {
   });
 
   after(async () => {
-    await postgres.query('DELETE FROM transaction_people;');
+    await postgres.query('DELETE FROM transaction_users;');
     await postgres.query('DELETE FROM transactions;');
     await postgres.query('DELETE FROM users;');
 

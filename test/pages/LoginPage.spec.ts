@@ -12,13 +12,13 @@ describe('LoginPage', () => {
   const postgres = new Postgres;
 
   before(async () => {
-    await postgres.query('DELETE FROM transaction_people;');
+    await postgres.query('DELETE FROM transaction_users;');
     await postgres.query('DELETE FROM transactions;');
     await postgres.query('DELETE FROM users;');
   });
 
   after(async () => {
-    await postgres.query('DELETE FROM transaction_people;');
+    await postgres.query('DELETE FROM transaction_users;');
     await postgres.query('DELETE FROM transactions;');
     await postgres.query('DELETE FROM users;');
     await postgres.end();

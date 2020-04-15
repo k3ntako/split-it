@@ -141,25 +141,25 @@ describe('Postgres', () => {
     });
   });
 
-  describe('createTransactionPerson', () => {
-    it('should save TransactionPerson', async () => {
+  describe('createTransactionUser', () => {
+    it('should save TransactionUser', async () => {
       const transactionId = 1;
 
-      const transactionPerson = await postgres.createTransactionPerson(transactionId, user1.id, user2.id, 10.20 / 2);
+      const transactionUser = await postgres.createTransactionUser(transactionId, user1.id, user2.id, 10.20 / 2);
 
-      expect(transactionPerson.transaction_id).to.equal(1);
-      expect(transactionPerson.lender_id).to.equal(user1.id);
-      expect(transactionPerson.borrower_id).to.equal(user2.id);
-      expect(Number(transactionPerson.amount_owed)).to.equal(10.20 / 2);
+      expect(transactionUser.transaction_id).to.equal(1);
+      expect(transactionUser.lender_id).to.equal(user1.id);
+      expect(transactionUser.borrower_id).to.equal(user2.id);
+      expect(Number(transactionUser.amount_owed)).to.equal(10.20 / 2);
 
-      const queryResult: QueryResult = await postgres.query(`SELECT * FROM transaction_people;`);
+      const queryResult: QueryResult = await postgres.query(`SELECT * FROM transaction_users;`);
 
-      const transactionPersonDB = queryResult.rows[0];
+      const transactionUserDB = queryResult.rows[0];
 
-      expect(transactionPersonDB.transaction_id).to.equal(1);
-      expect(transactionPersonDB.lender_id).to.equal(user1.id);
-      expect(transactionPersonDB.borrower_id).to.equal(user2.id);
-      expect(Number(transactionPersonDB.amount_owed)).to.equal(10.20 / 2);
+      expect(transactionUserDB.transaction_id).to.equal(1);
+      expect(transactionUserDB.lender_id).to.equal(user1.id);
+      expect(transactionUserDB.borrower_id).to.equal(user2.id);
+      expect(Number(transactionUserDB.amount_owed)).to.equal(10.20 / 2);
     });
   });
 

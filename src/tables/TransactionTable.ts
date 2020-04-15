@@ -7,7 +7,7 @@ export interface ITransaction {
   date: Date;
 }
 
-export interface ITransactionPerson {
+export interface ITransactionUser {
   id: number;
   transaction_id: number;
   lender_id: number;
@@ -29,7 +29,7 @@ export default class TransactionTable implements ITransactionTable {
   async create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction> {
     const transaction = await this.database.createTransaction(name, date, cost);
 
-    await this.database.createTransactionPerson(transaction.id, lenderId, borrowerId, cost / 2);
+    await this.database.createTransactionUser(transaction.id, lenderId, borrowerId, cost / 2);
 
     return transaction;
   }

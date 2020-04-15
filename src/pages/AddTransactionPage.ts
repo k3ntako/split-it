@@ -21,7 +21,7 @@ export default class AddTransactionPage implements IPage {
     const users: IUser[] = await userTable.getAll();
 
     this.userIO.clear();
-    const otherUser: IUser | undefined = await this.getPerson(users);
+    const otherUser: IUser | undefined = await this.getUser(users);
 
     if (!otherUser) {
       throw Error('The other user cannot be undefined.')
@@ -47,7 +47,7 @@ export default class AddTransactionPage implements IPage {
     return null;
   }
 
-  private async getPerson(users: IUser[]): Promise<IUser | undefined> {
+  private async getUser(users: IUser[]): Promise<IUser | undefined> {
     const choices: string[] = users.reduce((acc: string[], user: IUser) => {
       if (user.first_name !== this.user.first_name) {
         return acc.concat(user.first_name);

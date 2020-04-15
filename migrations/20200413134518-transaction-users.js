@@ -15,7 +15,7 @@ exports.setup = function (options, seedLink) {
 };
 
 exports.up = function (db) {
-  return db.createTable('transaction_people', {
+  return db.createTable('transaction_users', {
     transaction_id: {
       type: 'int',
       primaryKey: true,
@@ -60,7 +60,7 @@ exports.up = function (db) {
 };
 
 exports.down = function (db) {
-  return db.dropTable('transaction_people');
+  return db.dropTable('transaction_users');
 };
 
 exports._meta = {
