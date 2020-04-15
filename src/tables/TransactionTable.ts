@@ -8,7 +8,6 @@ export interface ITransaction {
 }
 
 export interface ITransactionUser {
-  id: number;
   transaction_id: number;
   lender_id: number;
   borrower_id: number;
@@ -29,9 +28,11 @@ export default class TransactionTable implements ITransactionTable {
   async create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction> {
     this.validate(name, date, cost);
 
+    const amountOwed: number = this.halveCost(cost);
+
     const transaction = await this.database.createTransaction(name, date, cost);
 
-    await this.database.createTransactionUser(transaction.id, lenderId, borrowerId, cost / 2);
+    await this.database.createTransactionUser(transaction.id, lenderId, borrowerId, amountOwed);
 
     return transaction;
   }
@@ -53,8 +54,19 @@ export default class TransactionTable implements ITransactionTable {
       throw new Error('Expected cost to be a positive number')
     }
 
-    if (cost * 100 % 1) {
+    if ((cost * 100) % 1) {
       throw new Error('Cost cannot go past the hundredths')
     }
+  }
+
+  private halveCost(cost: number): number {
+    let half = cost / 2;
+
+    if (cost % 2) {
+      const rounder = Math.floor(Math.random() * 2) ? Math.floor : Math.ceil;
+      half = rounder(half * 100) / 100;
+    }
+
+    return half;
   }
 }

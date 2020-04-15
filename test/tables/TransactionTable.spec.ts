@@ -120,5 +120,32 @@ describe('UserTable model', () => {
         expect(error.message).to.equal('Cost cannot go past the hundredths');
       }
     });
+
+    it('should randomly round up or down if an odd number is passed in', async () => {
+      const originalMethod = transactionTable.database.createTransactionUser;
+
+      try {
+        const mockMethod = async (transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionUser> => {
+          const isValid = amountOwed === 1.66 || amountOwed === 1.67;
+
+          expect(isValid).to.be.true;
+
+          return {
+            transaction_id: transactionId,
+            lender_id: lenderId,
+            borrower_id: borrowerId,
+            amount_owed: amountOwed,
+          };
+        }
+
+        transactionTable.database.createTransactionUser = mockMethod;
+
+        await transactionTable.create(user1.id, user2.id, name, date, 3.33);
+      } catch (error) {
+        throw error;
+      } finally {
+        transactionTable.database.createTransactionUser = originalMethod;
+      }
+    });
   });
 });
