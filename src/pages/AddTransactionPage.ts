@@ -31,8 +31,7 @@ export default class AddTransactionPage implements IPage {
     const userPaid: boolean = await this.getUserPaid();
     const cost: number = await this.getCost();
 
-    const lender: IUser = userPaid ? this.user : otherUser;
-    const borrower: IUser = userPaid ? otherUser : this.user;
+    const [lender, borrower]: IUser[] = userPaid ? [this.user, otherUser] : [otherUser, this.user];
 
     await transactionTable.create(lender.id, borrower.id, name, date, cost);
 

@@ -28,7 +28,7 @@ export default class TransactionTable implements ITransactionTable {
   async create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction> {
     this.validate(name, date, cost);
 
-    const amountOwed: number = this.halveCost(cost);
+    const amountOwed: number = this.splitCost(cost);
 
     const transaction = await this.database.createTransaction(name, date, cost);
 
@@ -59,7 +59,7 @@ export default class TransactionTable implements ITransactionTable {
     }
   }
 
-  private halveCost(cost: number): number {
+  private splitCost(cost: number): number {
     let half = cost / 2;
 
     if (cost % 2) {
