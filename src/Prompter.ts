@@ -5,7 +5,7 @@ import Separator from 'inquirer/lib/objects/separator';
 export interface IPrompter {
   userIO: IUserIO;
   promptList(message: string, choices: (string | Separator)[]): Promise<Answers>;
-  promptInput(message: string): Promise<Answers>;
+  promptText(message: string): Promise<Answers>;
   promptConfirm(message: string): Promise<Answers>;
   promptNumber(message: string): Promise<Answers>;
   promptDate(message: string): Promise<Answers>;
@@ -25,55 +25,31 @@ export default class Prompter implements IPrompter {
     this.userIO = userIO;
   }
 
-  async promptList(message: string, choices: (string | Separator)[]): Promise<Answers> {
-    const options: IQuestionOptions[] = [{
-      type: 'list',
-      name: 'action',
-      message,
-      choices,
-    }];
+  private async prompt(type: string, name: string, message: string, choices?: (string | Separator)[], format?: string[]) {
+    const options: IQuestionOptions = { type, name, message };
+    choices && choices.length && (options.choices = choices);
+    format && (options.format = format);
 
-    return await this.userIO.prompt(options);
+    return await this.userIO.prompt([options]);
   }
 
-  async promptInput(message: string): Promise<Answers> {
-    const options: IQuestionOptions[] = [{
-      type: 'input',
-      name: 'input',
-      message,
-    }];
+  async promptList(message: string, choices: (string | Separator)[]): Promise<Answers> {
+    return await this.prompt('list', 'action', message, choices);
+  }
 
-    return await this.userIO.prompt(options);
+  async promptText(message: string): Promise<Answers> {
+    return await this.prompt('input', 'input', message);
   }
 
   async promptConfirm(message: string): Promise<Answers> {
-    const options: IQuestionOptions[] = [{
-      type: 'confirm',
-      name: 'confirmation',
-      message,
-    }];
-
-    return await this.userIO.prompt(options);
+    return await this.prompt('confirm', 'confirmation', message);
   }
 
   async promptNumber(message: string): Promise<Answers> {
-    const options: IQuestionOptions[] = [{
-      type: 'number',
-      name: 'number',
-      message,
-    }];
-
-    return await this.userIO.prompt(options);
+    return await this.prompt('number', 'number', message);
   }
 
   async promptDate(message: string): Promise<Answers> {
-    const options: IQuestionOptions[] = [{
-      type: 'datetime',
-      name: 'date',
-      message,
-      format: ['m', '/', 'd', '/', 'yy'],
-    }];
-
-    return await this.userIO.prompt(options);
+    return await this.prompt('datetime', 'date', message, [], ['m', '/', 'd', '/', 'yy']);
   }
 }

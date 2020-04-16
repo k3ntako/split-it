@@ -65,7 +65,7 @@ export default class AddTransactionPage implements IPage {
 
     let name: string = '';
     while (true) {
-      const answer: Answers = await this.prompter.promptInput('Name the transaction:');
+      const answer: Answers = await this.prompter.promptText('Name the transaction:');
       name = answer.input;
 
       if (name && name.trim()) {

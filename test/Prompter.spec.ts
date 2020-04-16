@@ -19,12 +19,12 @@ describe('Prompter', () => {
     });
   });
 
-  describe('promptInput', () => {
+  describe('promptText', () => {
     it('should ask for a text input', async () => {
       const mockCLI: MockCLI = new MockCLI();
       const promptPreparer = new Prompter(mockCLI);
 
-      await promptPreparer.promptInput('What\'s your name?');
+      await promptPreparer.promptText('What\'s your name?');
 
       expect(mockCLI.promptArguments[0]).to.eql({
         type: "input",
