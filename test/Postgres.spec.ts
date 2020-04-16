@@ -1,25 +1,23 @@
 import { expect } from 'chai';
-import Postgres, { IPostgres, IPool } from '../src/Postgres';
-import { Pool, QueryResult } from 'pg';
+import Postgres, { IPostgres } from '../src/Postgres';
+import { QueryResult } from 'pg';
+import { userTable } from '../src/tables';
+import { IUser } from '../src/tables/UserTable';
 
 let postgres: IPostgres;
 
+let user1: IUser, user2: IUser;
+
 describe('Postgres', () => {
-  before(() => {
+  before(async () => {
     postgres = new Postgres();
+
+    user1 = await userTable.create('Postgres 1');
+    user2 = await userTable.create('Postgres 2');
   });
 
-  after(() => {
-    const pool: IPool = postgres.pool;
-    !pool.ended && pool.end();
-  });
-
-  describe('constructor', () => {
-    it('should be initialized with a pool based on config and env', () => {
-      const pool: IPool = postgres.pool;
-      expect(pool).to.be.instanceOf(Pool);
-      expect(pool.options && pool.options.database).to.equal('split_it_test');
-    });
+  after(async () => {
+    await postgres.end();
   });
 
   describe('getConfig', () => {
@@ -38,19 +36,38 @@ describe('Postgres', () => {
     });
   });
 
+  describe('query', () => {
+    it('should get config for specified environment', () => {
+      let calledWith = null;
+
+      const query = (sql: any): any => {
+        calledWith = sql;
+      }
+
+      const postgresInstance = new Postgres();
+      postgresInstance.query = query;
+
+      postgresInstance.query('SELECT * FROM users;');
+
+      expect(calledWith).to.equal('SELECT * FROM users;');
+    });
+  });
+
   describe('createUser', () => {
     it('should save user to database', async () => {
       const firstName = 'Fun User';
 
       const user = await postgres.createUser(firstName);
 
-      expect(user).to.eql({
-        id: 1,
-        first_name: firstName,
-      });
+      if (user) {
+        expect(user).to.have.all.keys(['id', 'first_name']);
+        expect(user.first_name).to.equal(firstName);
 
-      const userFromDB: QueryResult = await postgres.pool.query(`SELECT * FROM users WHERE first_name='${firstName}'`);
-      expect(userFromDB.rows[0].first_name).to.equal(firstName);
+        const userFromDB: QueryResult = await postgres.query(`SELECT * FROM users WHERE first_name='${firstName}'`);
+        expect(userFromDB.rows[0].first_name).to.equal(firstName);
+      } else {
+        expect.fail('Expected user to exist');
+      }
     });
   });
 
@@ -60,33 +77,86 @@ describe('Postgres', () => {
 
       const user = await postgres.findUserByName(firstName);
 
-      expect(user).to.eql({
-        id: 1,
-        first_name: firstName,
-      });
-    });
-
-    it('should find user from database regardless of case', async () => {
-      const firstName = 'fun user';
-
-      const user = await postgres.findUserByName(firstName);
-
-      expect(user).to.eql({
-        id: 1,
-        first_name: 'Fun User',
-      });
+      if (user) {
+        expect(user).to.have.all.keys(['id', 'first_name']);
+        expect(user.first_name).to.equal(firstName);
+      } else {
+        expect.fail('Expected user to exist');
+      }
     });
   });
 
   describe('getAllUsers', () => {
     it('should find all users', async () => {
       const users = await postgres.getAllUsers();
-      expect(users).to.have.lengthOf(1);
+      expect(users).to.have.lengthOf(3);
 
-      expect(users[0]).to.eql({
+      const user = users.find(u => u.first_name === 'Fun User');
+
+      if (user) {
+        expect(user).to.have.all.keys(['id', 'first_name']);
+        expect(user.first_name).to.equal('Fun User');
+      } else {
+        expect.fail('Expected user to exist');
+      }
+    });
+  });
+
+  describe('createTransaction', () => {
+    it('should save transaction to database', async () => {
+      const name = 'Market';
+      const date = new Date();
+      const costInCents: number = 1020;
+
+      const transaction = await postgres.createTransaction(name, date, costInCents);
+
+      const dateMidnight = date;
+      dateMidnight.setHours(0, 0, 0, 0);
+
+      expect(transaction).to.eql({
         id: 1,
-        first_name: 'Fun User',
+        name,
+        date: dateMidnight,
+        cost: costInCents,
       });
+
+      const queryResult: QueryResult = await postgres.query('SELECT * FROM transactions;');
+      const transactionFromDB = queryResult.rows[0];
+
+      expect(transactionFromDB.name).to.equal(name);
+      expect(transactionFromDB.date).to.eql(dateMidnight);
+      expect(transactionFromDB.cost).to.equal(costInCents);
+    });
+  });
+
+  describe('createTransactionUser', () => {
+    it('should save TransactionUser', async () => {
+      const amountOwedInCents = 1020 / 2;
+      const transactionId = 1;
+
+      const transactionUser = await postgres.createTransactionUser(transactionId, user1.id, user2.id, amountOwedInCents);
+
+      expect(transactionUser.transaction_id).to.equal(1);
+      expect(transactionUser.lender_id).to.equal(user1.id);
+      expect(transactionUser.borrower_id).to.equal(user2.id);
+      expect(Number(transactionUser.amount_owed)).to.equal(amountOwedInCents);
+
+      const queryResult: QueryResult = await postgres.query(`SELECT * FROM transaction_users;`);
+
+      const transactionUserDB = queryResult.rows[0];
+
+      expect(transactionUserDB.transaction_id).to.equal(1);
+      expect(transactionUserDB.lender_id).to.equal(user1.id);
+      expect(transactionUserDB.borrower_id).to.equal(user2.id);
+      expect(Number(transactionUserDB.amount_owed)).to.equal(amountOwedInCents);
+    });
+  });
+
+  describe('ended', () => {
+    it('should return if pool ended', () => {
+      const ended = postgres.ended;
+
+      expect(ended).to.be.false;
     });
   });
 
@@ -94,7 +164,7 @@ describe('Postgres', () => {
     it('should end pool', async () => {
       await postgres.end();
 
-      expect(postgres.pool.ended).to.be.true;
+      expect(postgres.ended).to.be.true;
     });
   });
 });

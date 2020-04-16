@@ -1,29 +1,32 @@
 import IPage from "./IPage";
 import { Answers } from "inquirer";
 import { userTable } from '../tables';
+import { IUser } from "../tables/UserTable";
 import { IUserIO } from "../CLI";
 import { IPrompter } from "../Prompter";
+import MenuPage from "./MenuPage";
 
 export default class SignUpPage implements IPage {
   userIO: IUserIO;
   prompter: IPrompter;
 
-  constructor(userIO: IUserIO, prompter: IPrompter){
+  constructor(userIO: IUserIO, prompter: IPrompter) {
     this.userIO = userIO;
     this.prompter = prompter;
   }
 
-  async display(): Promise<null> {
+  async display(): Promise<IPage> {
     this.userIO.clear();
 
     let isValid: boolean = false;
+    let user: IUser | null = null;
 
     while (!isValid) {
       try {
-        const nameAnswer: Answers = await this.prompter.promptInput('What\'s your name?');
+        const nameAnswer: Answers = await this.prompter.promptText('What\'s your name?');
         const firstName: string = nameAnswer.input;
 
-        await userTable.create(firstName);
+        user = await userTable.create(firstName);
 
         isValid = true;
       } catch (error) {
@@ -32,6 +35,10 @@ export default class SignUpPage implements IPage {
       }
     }
 
-    return null;
+    if (!user) {
+      throw new Error('No user created');
+    }
+
+    return new MenuPage(this.userIO, this.prompter, user);
   }
 }

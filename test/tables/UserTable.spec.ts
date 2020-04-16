@@ -1,12 +1,29 @@
 import { expect } from 'chai';
 import { userTable } from '../../src/tables';
+import Postgres from '../../src/Postgres';
 
 describe('UserTable model', () => {
+  const postgres = new Postgres;
+
+  before(async () => {
+    await postgres.query('DELETE FROM transaction_users;');
+    await postgres.query('DELETE FROM transactions;');
+    await postgres.query('DELETE FROM users;');
+  });
+
+  after(async () => {
+    await postgres.query('DELETE FROM transaction_users;');
+    await postgres.query('DELETE FROM transactions;');
+    await postgres.query('DELETE FROM users;');
+
+    await postgres.end();
+  });
+
   describe('create', () => {
     it('should create a user and save name as Title Case', async () => {
       await userTable.create('User table model 1');
 
-      const user = await userTable.database.findUserByName('User table model 1');
+      const user = await userTable.database.findUserByName('User Table Model 1');
 
       if (user) {
         expect(user.first_name).to.equal('User Table Model 1');
@@ -14,13 +31,11 @@ describe('UserTable model', () => {
         expect.fail('Expected user to exist');
       }
     });
-  });
 
-  describe('validate', () => {
     it('should throw error given a blank name', async () => {
       try {
-        await userTable.validate('');
-        expect.fail('Expected UserTable.validate to throw error');
+        await userTable.create('');
+        expect.fail('Expected UserTable.create to throw error');
       } catch (error) {
         expect(error.message).to.equal('Name cannot be blank');
       }
@@ -30,8 +45,8 @@ describe('UserTable model', () => {
       await userTable.create('UserModelCreate2');
 
       try {
-        await userTable.validate('Usermodelcreate2');
-        expect.fail('Expected UserTable.validate to throw error');
+        await userTable.create('Usermodelcreate2');
+        expect.fail('Expected UserTable.create to throw error');
       } catch (error) {
         expect(error.message).to.equal('The name, Usermodelcreate2, is already taken.');
       }
@@ -39,11 +54,11 @@ describe('UserTable model', () => {
   });
 
   describe('findByName', () => {
-    it('should find user by name regardless of case', async () => {
-      const user = await userTable.findByName('UserModelCreate2');
+    it('should find user by name', async () => {
+      const user = await userTable.findByName('Usermodelcreate2');
       expect(user).to.have.all.keys(['id', 'first_name']);
 
-      if (user){
+      if (user) {
         expect(user.id).to.be.a('number');
         expect(user.first_name).to.equal('Usermodelcreate2');
       } else {
@@ -53,9 +68,9 @@ describe('UserTable model', () => {
   });
 
   describe('getAll', () => {
-    it('should find user by name regardless of case', async () => {
+    it('should find all users', async () => {
       const users = await userTable.getAll();
-      expect(users).to.have.lengthOf(7);
+      expect(users).to.have.lengthOf(2);
       expect(users[0]).to.have.all.keys(['id', 'first_name']);
     });
   });

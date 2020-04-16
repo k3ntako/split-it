@@ -3,6 +3,7 @@ import { Answers } from "inquirer";
 
 const clear = require('clear');
 const inquirer = require('inquirer');
+inquirer.registerPrompt('datetime', require('inquirer-datepicker-prompt'));
 
 export interface IUserIO {
   print(message: string): void;
