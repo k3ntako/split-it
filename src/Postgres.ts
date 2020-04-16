@@ -110,7 +110,6 @@ export default class Postgres implements IPostgres {
     );
 
     const transaction: ITransaction = result.rows[0];
-    transaction.cost = Number(transaction.cost); // pg does cannot safely convert decimal to JS number
 
     return transaction;
   }
@@ -124,7 +123,6 @@ export default class Postgres implements IPostgres {
     );
 
     const transactionUser: ITransactionUser = result.rows[0];
-    transactionUser.amount_owed = Number(transactionUser.amount_owed); // pg does cannot safely convert decimal to JS number
 
     return transactionUser;
   }

@@ -106,9 +106,9 @@ describe('Postgres', () => {
     it('should save transaction to database', async () => {
       const name = 'Market';
       const date = new Date();
-      const cost = 10.20;
+      const costInCents: number = 1020;
 
-      const transaction = await postgres.createTransaction(name, date, cost);
+      const transaction = await postgres.createTransaction(name, date, costInCents);
 
       const dateMidnight = date;
       dateMidnight.setHours(0, 0, 0, 0);
@@ -117,29 +117,29 @@ describe('Postgres', () => {
         id: 1,
         name,
         date: dateMidnight,
-        cost,
+        cost: costInCents,
       });
 
       const queryResult: QueryResult = await postgres.query('SELECT * FROM transactions;');
       const transactionFromDB = queryResult.rows[0];
-      const costAsNum = Number(transactionFromDB.cost);
 
       expect(transactionFromDB.name).to.equal(name);
       expect(transactionFromDB.date).to.eql(dateMidnight);
-      expect(costAsNum).to.equal(cost);
+      expect(transactionFromDB.cost).to.equal(costInCents);
     });
   });
 
   describe('createTransactionUser', () => {
     it('should save TransactionUser', async () => {
+      const amountOwedInCents = 1020 / 2;
       const transactionId = 1;
 
-      const transactionUser = await postgres.createTransactionUser(transactionId, user1.id, user2.id, 10.20 / 2);
+      const transactionUser = await postgres.createTransactionUser(transactionId, user1.id, user2.id, amountOwedInCents);
 
       expect(transactionUser.transaction_id).to.equal(1);
       expect(transactionUser.lender_id).to.equal(user1.id);
       expect(transactionUser.borrower_id).to.equal(user2.id);
-      expect(Number(transactionUser.amount_owed)).to.equal(10.20 / 2);
+      expect(Number(transactionUser.amount_owed)).to.equal(amountOwedInCents);
 
       const queryResult: QueryResult = await postgres.query(`SELECT * FROM transaction_users;`);
 
@@ -148,7 +148,7 @@ describe('Postgres', () => {
       expect(transactionUserDB.transaction_id).to.equal(1);
       expect(transactionUserDB.lender_id).to.equal(user1.id);
       expect(transactionUserDB.borrower_id).to.equal(user2.id);
-      expect(Number(transactionUserDB.amount_owed)).to.equal(10.20 / 2);
+      expect(Number(transactionUserDB.amount_owed)).to.equal(amountOwedInCents);
     });
   });
 

@@ -55,7 +55,7 @@ exports.up = function (db) {
         mapping: 'id',
       },
     },
-    amount_owed: { type: 'decimal', notNull: true },
+    amount_owed: { type: 'int', notNull: true },
   });
 };
 

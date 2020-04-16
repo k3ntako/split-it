@@ -126,7 +126,7 @@ describe('UserTable model', () => {
 
       try {
         const mockMethod = async (transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionUser> => {
-          const isValid = amountOwed === 1.66 || amountOwed === 1.67;
+          const isValid = amountOwed === 166 || amountOwed === 167; // in cents
 
           expect(isValid).to.be.true;
 

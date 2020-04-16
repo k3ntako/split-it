@@ -18,7 +18,7 @@ exports.up = function (db) {
   return db.createTable('transactions', {
     id: { type: 'int', primaryKey: true, autoIncrement: true },
     name: { type: 'string', notNull: true },
-    cost: { type: 'decimal', notNull: true },
+    cost: { type: 'int', notNull: true },
     date: { type: 'date', notNull: true },
   });
 };
