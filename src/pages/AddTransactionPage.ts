@@ -64,9 +64,16 @@ export default class AddTransactionPage implements IPage {
     this.clearAndDisplayTitle();
 
     let name: string = '';
-    while (!name || !name.trim()) {
-      const answer: Answers = await this.prompter.promptInput('Name the transaction');
+    while (true) {
+      const answer: Answers = await this.prompter.promptInput('Name the transaction:');
       name = answer.input;
+
+      if (name && name.trim()) {
+        break;
+      }
+
+      this.clearAndDisplayTitle();
+      this.userIO.print('Invalid name, please try again!');
     }
 
     return name;
@@ -90,9 +97,16 @@ export default class AddTransactionPage implements IPage {
     this.clearAndDisplayTitle();
 
     let cost: number = NaN;
-    while (isNaN(cost) || cost <= 0 || (cost * 100 % 1)) {
+    while (true) {
       const answer: Answers = await this.prompter.promptNumber('How much did it cost?');
       cost = answer.number;
+
+      if (!isNaN(cost) && cost > 0 && !(cost * 100 % 1)) {
+        break;
+      }
+
+      this.clearAndDisplayTitle();
+      this.userIO.print('Invalid cost, please enter a positive number with at most two decimal places!');
     }
 
     return cost;

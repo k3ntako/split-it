@@ -51,7 +51,7 @@ describe('AddTransactionPage', () => {
     const expectedTitle: string = chalk.bold('Add a Transaction\n');
 
     const diplayTitleArgs = mockCLI.printArguments.filter(str => str === expectedTitle);
-    expect(diplayTitleArgs.length).to.equal(mockCLI.promptMockAnswers.length + 1);
+    expect(diplayTitleArgs).to.have.lengthOf(mockCLI.promptMockAnswers.length + 1);
   });
 
   it('should ask user who else was involved in the transaction', async () => {
@@ -68,7 +68,7 @@ describe('AddTransactionPage', () => {
 
     const nameArg: IQuestionOptions = mockCLI.promptArguments[1];
     expect(nameArg.type).to.equal('input');
-    expect(nameArg.message).to.equal('Name the transaction');
+    expect(nameArg.message).to.equal('Name the transaction:');
   });
 
   it('should ask user for the transaction date', async () => {
@@ -159,6 +159,10 @@ describe('AddTransactionPage', () => {
 
       await addTransactionPage.display();
 
+      const expectedError = 'Invalid name, please try again!';
+      const diplayErrorArgs = mockCLI.printArguments.filter(str => str === expectedError);
+      expect(diplayErrorArgs).to.have.lengthOf(2);
+
     } catch (error) {
       throw error;
     } finally {
@@ -166,7 +170,7 @@ describe('AddTransactionPage', () => {
     }
   });
 
-  it('should continue cost is a positive number with no more than two decimal points', async () => {
+  it('should continue to ask until cost is a positive number with no more than two decimal places', async () => {
     const originalCreate = transactionTable.create; // save original method
 
     mockCLI.promptMockAnswers = [
@@ -191,6 +195,10 @@ describe('AddTransactionPage', () => {
       };
 
       await addTransactionPage.display();
+
+      const expectedError = 'Invalid cost, please enter a positive number with at most two decimal places!';
+      const diplayErrorArgs = mockCLI.printArguments.filter(str => str === expectedError);
+      expect(diplayErrorArgs).to.have.lengthOf(3);
     } catch (error) {
       throw error;
     } finally {
