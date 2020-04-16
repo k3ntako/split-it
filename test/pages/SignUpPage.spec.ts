@@ -41,7 +41,7 @@ describe('SignUpPage', () => {
     const signUpPage = new SignUpPage(mockCLI, prompter);
     await signUpPage.display();
 
-    const newValidName = await userTable.findByName('New valid name');
+    const newValidName = await userTable.findByName('New Valid Name');
     expect(newValidName).to.exist;
   });
 

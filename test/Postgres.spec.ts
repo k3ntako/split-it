@@ -84,17 +84,6 @@ describe('Postgres', () => {
         expect.fail('Expected user to exist');
       }
     });
-
-    it('should find user from database regardless of case', async () => {
-      const user = await postgres.findUserByName('fun user');
-
-      if (user) {
-        expect(user).to.have.all.keys(['id', 'first_name']);
-        expect(user.first_name).to.equal('Fun User');
-      } else {
-        expect.fail('Expected user to exist');
-      }
-    });
   });
 
   describe('getAllUsers', () => {

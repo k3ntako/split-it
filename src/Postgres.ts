@@ -89,7 +89,7 @@ export default class Postgres implements IPostgres {
   }
 
   async findUserByName(firstName: string): Promise<IUser | null> {
-    const result: QueryResult = await this.query(`SELECT * FROM users WHERE first_name ILIKE '${firstName}';`);
+    const result: QueryResult = await this.query(`SELECT * FROM users WHERE first_name='${firstName}';`);
     return result.rows[0];
   }
 

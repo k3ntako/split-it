@@ -23,7 +23,7 @@ describe('UserTable model', () => {
     it('should create a user and save name as Title Case', async () => {
       await userTable.create('User table model 1');
 
-      const user = await userTable.database.findUserByName('User table model 1');
+      const user = await userTable.database.findUserByName('User Table Model 1');
 
       if (user) {
         expect(user.first_name).to.equal('User Table Model 1');
@@ -54,8 +54,8 @@ describe('UserTable model', () => {
   });
 
   describe('findByName', () => {
-    it('should find user by name regardless of case', async () => {
-      const user = await userTable.findByName('UserModelCreate2');
+    it('should find user by name', async () => {
+      const user = await userTable.findByName('Usermodelcreate2');
       expect(user).to.have.all.keys(['id', 'first_name']);
 
       if (user) {
@@ -68,7 +68,7 @@ describe('UserTable model', () => {
   });
 
   describe('getAll', () => {
-    it('should find user by name regardless of case', async () => {
+    it('should find all users', async () => {
       const users = await userTable.getAll();
       expect(users).to.have.lengthOf(2);
       expect(users[0]).to.have.all.keys(['id', 'first_name']);
