@@ -30,13 +30,24 @@ export default class TransactionTable implements ITransactionTable {
 
     this.validate(name, date, cost);
 
+    const dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+
     const amountOwed: number = this.splitCost(cost);
 
-    const transaction = await this.database.createTransaction(name, date, cost);
+    const transactions: ITransaction[] = await this.database.insert('transactions', {
+      name,
+      date: dateStr,
+      cost,
+    });
 
-    await this.database.createTransactionUser(transaction.id, lenderId, borrowerId, amountOwed);
+    await this.database.insert('transaction_users', {
+      transaction_id: transactions[0].id,
+      lender_id: lenderId,
+      borrower_id: borrowerId,
+      amount_owed: amountOwed,
+    });
 
-    return transaction;
+    return transactions[0];
   }
 
   private validate(name: string, date: Date, cost: number) {
@@ -45,19 +56,19 @@ export default class TransactionTable implements ITransactionTable {
     }
 
     if (!(date instanceof Date)) {
-      throw new Error('Expected date to be instance of date')
+      throw new Error('Expected date to be instance of date');
     }
 
     if (isNaN(cost) || typeof cost !== 'number') {
-      throw new Error('Expected cost to be a number')
+      throw new Error('Expected cost to be a number');
     }
 
     if (cost <= 0) {
-      throw new Error('Expected cost to be a positive number')
+      throw new Error('Expected cost to be a positive number');
     }
 
     if (cost % 1) {
-      throw new Error('Cost cannot go past the hundredths')
+      throw new Error('Cost cannot go past the hundredths');
     }
   }
 

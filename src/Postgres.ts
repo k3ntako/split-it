@@ -1,7 +1,6 @@
 import { Pool, QueryResult } from 'pg';
 import { IUser } from './tables/UserTable';
 import fs from 'fs';
-import { ITransaction, ITransactionUser } from './tables/TransactionTable';
 
 interface IPoolConfig {
   host: string;
@@ -10,9 +9,9 @@ interface IPoolConfig {
 }
 
 interface IPoolFileConfig {
-  driver: string,
-  user: string | null,
-  password: string | null,
+  driver: string;
+  user: string | null;
+  password: string | null;
   host: string;
   database: string;
   port: number;
@@ -20,21 +19,19 @@ interface IPoolFileConfig {
 
 export interface IDatabase {
   query(sql: string): Promise<QueryResult>;
-  createUser(firstName: string): Promise<IUser>;
   findUserByName(firstName: string): Promise<IUser | null>;
   getAllUsers(): Promise<IUser[]>;
-  createTransaction(name: string, date: Date, cost: number): Promise<ITransaction>;
-  createTransactionUser(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionUser>;
+  insert(tableName: string, attributes: {}): Promise<any[]>;
   end(): Promise<void>;
 }
 
 export interface IPool extends Pool {
   options?: {
-    host: string,
-    database: string,
-    port: number,
-    max: number,
-    idleTimeoutMillis: number
+    host: string;
+    database: string;
+    port: number;
+    max: number;
+    idleTimeoutMillis: number;
   };
   ended?: boolean;
 }
@@ -83,9 +80,27 @@ export default class Postgres implements IPostgres {
     return new Pool(config);
   }
 
-  async createUser(firstName: string): Promise<IUser> {
-    const result: QueryResult = await this.query(`INSERT INTO users (first_name) VALUES ('${firstName}') RETURNING *;`);
-    return result.rows[0];
+  async insert(tableName: string, attributes: any): Promise<any[]> {
+    const fields = Object.keys(attributes);
+    const fieldsStr: string = fields.join(', ');
+
+    const values = fields.map((field) => {
+      let attribute = attributes[field];
+
+      if (typeof attribute === 'string') {
+        attribute = `'${attribute}'`;
+      }
+
+      return attribute;
+    });
+
+    const valuesStr: string = values.join(', ');
+
+    const created: QueryResult = await this.query(
+      `INSERT INTO ${tableName} (${fieldsStr}) VALUES (${valuesStr}) RETURNING *;`,
+    );
+
+    return created.rows;
   }
 
   async findUserByName(firstName: string): Promise<IUser | null> {
@@ -99,35 +114,7 @@ export default class Postgres implements IPostgres {
     return result.rows;
   }
 
-  async createTransaction(name: string, date: Date, cost: number): Promise<ITransaction> {
-    const dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-
-    const result: QueryResult = await this.query(
-      'INSERT INTO transactions ' +
-      '(name, date, cost) ' +
-      `VALUES('${name}', '${dateStr}', ${cost}) ` +
-      'RETURNING *;'
-    );
-
-    const transaction: ITransaction = result.rows[0];
-
-    return transaction;
-  }
-
-  async createTransactionUser(transactionId: number, lenderId: number, borrowerId: number, amountOwed: number): Promise<ITransactionUser> {
-    const result: QueryResult = await this.query(
-      'INSERT INTO transaction_users ' +
-      '(transaction_id, lender_id, borrower_id, amount_owed) ' +
-      `VALUES(${transactionId}, ${lenderId}, ${borrowerId}, ${amountOwed}) ` +
-      'RETURNING *;'
-    );
-
-    const transactionUser: ITransactionUser = result.rows[0];
-
-    return transactionUser;
-  }
-
   async end(): Promise<void> {
-    !this.pool.ended && await this.pool.end();
+    !this.pool.ended && (await this.pool.end());
   }
 }

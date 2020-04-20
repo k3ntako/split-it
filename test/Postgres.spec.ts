@@ -1,19 +1,15 @@
 import { expect } from 'chai';
 import Postgres, { IPostgres } from '../src/Postgres';
-import { QueryResult } from 'pg';
 import { userTable } from '../src/tables';
 import { IUser } from '../src/tables/UserTable';
+import { ITransaction } from '../src/tables/TransactionTable';
 
 let postgres: IPostgres;
-
-let user1: IUser, user2: IUser;
 
 describe('Postgres', () => {
   before(async () => {
     postgres = new Postgres();
-
-    user1 = await userTable.create('Postgres 1');
-    user2 = await userTable.create('Postgres 2');
+    userTable.create('fun user');
   });
 
   after(async () => {
@@ -23,12 +19,12 @@ describe('Postgres', () => {
   describe('getConfig', () => {
     it('should get config for specified environment', () => {
       const expected = {
-        driver: "pg",
-        user: "test_user",
-        password: "",
-        host: "localhost",
-        database: "split_it_test",
-        port: 5432
+        driver: 'pg',
+        user: 'test_user',
+        password: '',
+        host: 'localhost',
+        database: 'split_it_test',
+        port: 5432,
       };
 
       const config = postgres.getConfig('test');
@@ -42,7 +38,7 @@ describe('Postgres', () => {
 
       const query = (sql: any): any => {
         calledWith = sql;
-      }
+      };
 
       const postgresInstance = new Postgres();
       postgresInstance.query = query;
@@ -50,24 +46,6 @@ describe('Postgres', () => {
       postgresInstance.query('SELECT * FROM users;');
 
       expect(calledWith).to.equal('SELECT * FROM users;');
-    });
-  });
-
-  describe('createUser', () => {
-    it('should save user to database', async () => {
-      const firstName = 'Fun User';
-
-      const user = await postgres.createUser(firstName);
-
-      if (user) {
-        expect(user).to.have.all.keys(['id', 'first_name']);
-        expect(user.first_name).to.equal(firstName);
-
-        const userFromDB: QueryResult = await postgres.query(`SELECT * FROM users WHERE first_name='${firstName}'`);
-        expect(userFromDB.rows[0].first_name).to.equal(firstName);
-      } else {
-        expect.fail('Expected user to exist');
-      }
     });
   });
 
@@ -89,9 +67,9 @@ describe('Postgres', () => {
   describe('getAllUsers', () => {
     it('should find all users', async () => {
       const users = await postgres.getAllUsers();
-      expect(users).to.have.lengthOf(3);
+      expect(users).to.have.lengthOf(1);
 
-      const user = users.find(u => u.first_name === 'Fun User');
+      const user = users.find((u) => u.first_name === 'Fun User');
 
       if (user) {
         expect(user).to.have.all.keys(['id', 'first_name']);
@@ -102,53 +80,52 @@ describe('Postgres', () => {
     });
   });
 
-  describe('createTransaction', () => {
-    it('should save transaction to database', async () => {
-      const name = 'Market';
-      const date = new Date();
-      const costInCents: number = 1020;
-
-      const transaction = await postgres.createTransaction(name, date, costInCents);
-
-      const dateMidnight = date;
-      dateMidnight.setHours(0, 0, 0, 0);
-
-      expect(transaction).to.eql({
-        id: 1,
-        name,
-        date: dateMidnight,
-        cost: costInCents,
-      });
-
-      const queryResult: QueryResult = await postgres.query('SELECT * FROM transactions;');
-      const transactionFromDB = queryResult.rows[0];
-
-      expect(transactionFromDB.name).to.equal(name);
-      expect(transactionFromDB.date).to.eql(dateMidnight);
-      expect(transactionFromDB.cost).to.equal(costInCents);
+  describe('insert', () => {
+    before(async () => {
+      await postgres.query('DELETE FROM transaction_users;');
+      await postgres.query('DELETE FROM transactions;');
     });
-  });
 
-  describe('createTransactionUser', () => {
-    it('should save TransactionUser', async () => {
-      const amountOwedInCents = 1020 / 2;
-      const transactionId = 1;
+    it('should insert a new row in users', async () => {
+      const attributes = {
+        first_name: 'my name',
+      };
 
-      const transactionUser = await postgres.createTransactionUser(transactionId, user1.id, user2.id, amountOwedInCents);
+      const results: IUser[] = await postgres.insert('users', attributes);
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].id).to.be.a('number');
+      expect(results[0].first_name).to.equal(attributes.first_name);
 
-      expect(transactionUser.transaction_id).to.equal(1);
-      expect(transactionUser.lender_id).to.equal(user1.id);
-      expect(transactionUser.borrower_id).to.equal(user2.id);
-      expect(Number(transactionUser.amount_owed)).to.equal(amountOwedInCents);
+      const users = await postgres.query("SELECT * FROM users WHERE first_name='my name';");
+      expect(users.rows).to.have.lengthOf(1);
+      expect(users.rows[0].id).to.be.a('number');
+      expect(users.rows[0].first_name).to.equal(attributes.first_name);
+    });
 
-      const queryResult: QueryResult = await postgres.query(`SELECT * FROM transaction_users;`);
+    it('should insert a new row in transactions', async () => {
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      const dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 
-      const transactionUserDB = queryResult.rows[0];
+      const attributes = {
+        name: 'Pineapple',
+        cost: 1000,
+        date: dateStr,
+      };
 
-      expect(transactionUserDB.transaction_id).to.equal(1);
-      expect(transactionUserDB.lender_id).to.equal(user1.id);
-      expect(transactionUserDB.borrower_id).to.equal(user2.id);
-      expect(Number(transactionUserDB.amount_owed)).to.equal(amountOwedInCents);
+      const results: ITransaction[] = await postgres.insert('transactions', attributes);
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].id).to.be.a('number');
+      expect(results[0].name).to.equal(attributes.name);
+      expect(results[0].cost).to.equal(attributes.cost);
+      expect(results[0].date).to.eql(date);
+
+      const transactions = await postgres.query('SELECT * FROM transactions;');
+      expect(transactions.rows).to.have.lengthOf(1);
+      expect(transactions.rows[0].id).to.be.a('number');
+      expect(transactions.rows[0].name).to.equal(attributes.name);
+      expect(transactions.rows[0].cost).to.equal(attributes.cost);
+      expect(transactions.rows[0].date).to.eql(date);
     });
   });
 

@@ -24,7 +24,11 @@ export default class UserTable implements IUserTable {
 
     await this.validate(firstName);
 
-    return await this.database.createUser(firstName);
+    const users = await this.database.insert('users', {
+      first_name: firstName,
+    });
+
+    return users[0];
   }
 
   private async validate(firstName: string) {
@@ -44,7 +48,10 @@ export default class UserTable implements IUserTable {
   }
 
   private titleCase(firstName: string): string {
-    return firstName.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ');
+    return firstName
+      .split(' ')
+      .map((n) => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase())
+      .join(' ');
   }
 
   async getAll(): Promise<IUser[]> {
