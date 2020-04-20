@@ -5,6 +5,7 @@ import { Answers } from 'inquirer';
 import AddTransactionPage from './AddTransactionPage';
 import { IUser } from '../tables/UserTable';
 import Separator from 'inquirer/lib/objects/separator';
+import ViewBalancePage from './ViewBalancePage';
 
 interface INextPageOptions {
   [key: string]: new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage;
@@ -23,17 +24,15 @@ export default class MenuPage implements IPage {
     this.user = user;
     this.nextPageOptions = {
       'Add transaction': AddTransactionPage,
-    }
+      'View balance': ViewBalancePage,
+    };
   }
 
   async display(): Promise<IPage | null> {
     this.userIO.clear();
 
-    const exitChoices: (string | Separator)[] = [
-      new Separator(),
-      'Exit',
-    ];
-    let choices: (string | Separator)[] = Object.keys(this.nextPageOptions)
+    const exitChoices: (string | Separator)[] = [new Separator(), 'Exit'];
+    let choices: (string | Separator)[] = Object.keys(this.nextPageOptions);
     choices = choices.concat(exitChoices);
 
     const answer: Answers = await this.prompter.promptList('Main menu:', choices);
