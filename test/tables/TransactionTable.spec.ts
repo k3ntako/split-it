@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { userTable, transactionTable } from '../../src/tables';
 import PG_Interface from '../../src/PG_Interface';
 import { QueryResult } from 'pg';
-import { ITransactionUser } from '../../src/tables/TransactionTable';
+import { ITransactionUser, ITransaction } from '../../src/tables/TransactionTable';
 import { IUser } from '../../src/tables/UserTable';
 import PostgresQuery from '../../src/PostgresQuery';
 
