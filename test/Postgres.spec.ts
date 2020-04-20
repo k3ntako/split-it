@@ -1,15 +1,15 @@
 import { expect } from 'chai';
 import Postgres, { IPostgres } from '../src/Postgres';
-import { userTable } from '../src/tables';
+import { userTable, transactionTable } from '../src/tables';
 import { IUser } from '../src/tables/UserTable';
-import { ITransaction } from '../src/tables/TransactionTable';
+import { ITransaction, ITransactionUser } from '../src/tables/TransactionTable';
 
 let postgres: IPostgres;
 
 describe('Postgres', () => {
   before(async () => {
     postgres = new Postgres();
-    userTable.create('fun user');
+    await userTable.create('fun user');
   });
 
   after(async () => {
@@ -49,41 +49,17 @@ describe('Postgres', () => {
     });
   });
 
-  describe('findUserByName', () => {
-    it('should find user from database', async () => {
-      const firstName = 'Fun User';
-
-      const user = await postgres.findUserByName(firstName);
-
-      if (user) {
-        expect(user).to.have.all.keys(['id', 'first_name']);
-        expect(user.first_name).to.equal(firstName);
-      } else {
-        expect.fail('Expected user to exist');
-      }
-    });
-  });
-
-  describe('getAllUsers', () => {
-    it('should find all users', async () => {
-      const users = await postgres.getAllUsers();
-      expect(users).to.have.lengthOf(1);
-
-      const user = users.find((u) => u.first_name === 'Fun User');
-
-      if (user) {
-        expect(user).to.have.all.keys(['id', 'first_name']);
-        expect(user.first_name).to.equal('Fun User');
-      } else {
-        expect.fail('Expected user to exist');
-      }
-    });
-  });
-
   describe('insert', () => {
     before(async () => {
       await postgres.query('DELETE FROM transaction_users;');
       await postgres.query('DELETE FROM transactions;');
+      await postgres.query('DELETE FROM users;');
+    });
+
+    after(async () => {
+      await postgres.query('DELETE FROM transaction_users;');
+      await postgres.query('DELETE FROM transactions;');
+      await postgres.query('DELETE FROM users;');
     });
 
     it('should insert a new row in users', async () => {
@@ -126,6 +102,59 @@ describe('Postgres', () => {
       expect(transactions.rows[0].name).to.equal(attributes.name);
       expect(transactions.rows[0].cost).to.equal(attributes.cost);
       expect(transactions.rows[0].date).to.eql(date);
+    });
+  });
+
+  describe('select', () => {
+    let energizer: IUser, duracell: IUser;
+    before(async () => {
+      await postgres.query('DELETE FROM transaction_users;');
+      await postgres.query('DELETE FROM transactions;');
+      await postgres.query('DELETE FROM users;');
+
+      energizer = await userTable.create('Energizer');
+      duracell = await userTable.create('Duracell');
+      const eneloop: IUser = await userTable.create('Eneloop');
+      await transactionTable.create(energizer.id, duracell.id, 'Electric Bill', new Date(), 900);
+      await transactionTable.create(energizer.id, duracell.id, 'Tesla', new Date(), 10000);
+      await transactionTable.create(energizer.id, eneloop.id, 'Charge', new Date(), 1200);
+      await transactionTable.create(duracell.id, energizer.id, 'Light bulb', new Date(), 1500);
+      await transactionTable.create(duracell.id, eneloop.id, 'Gas Generator', new Date(), 2000);
+    });
+
+    after(async () => {
+      await postgres.query('DELETE FROM transaction_users;');
+      await postgres.query('DELETE FROM transactions;');
+      await postgres.query('DELETE FROM users;');
+    });
+
+    it('should select all rows from specified table', async () => {
+      const results: IUser[] = await postgres.select('users', {});
+      expect(results).to.have.lengthOf(3);
+      expect(results[0].id).to.be.a('number');
+      expect(results[0].first_name).to.equal('Energizer');
+      expect(results[1].first_name).to.equal('Duracell');
+      expect(results[2].first_name).to.equal('Eneloop');
+    });
+
+    it('should select all rows from table that fulfill a criterion', async () => {
+      const results: IUser[] = await postgres.select('users', {
+        first_name: 'Energizer',
+      });
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].id).to.be.a('number');
+      expect(results[0].first_name).to.equal('Energizer');
+    });
+
+    it('should select all rows from table that fulfill multiple criteria', async () => {
+      const results: ITransactionUser[] = await postgres.select('transaction_users', {
+        lender_id: energizer.id,
+        amount_owed: 45000,
+      });
+      expect(results).to.have.lengthOf(1);
+      expect(results[0].lender_id).to.equal(energizer.id);
+      expect(results[0].borrower_id).to.equal(duracell.id);
+      expect(results[0].amount_owed).to.equal(45000);
     });
   });
 

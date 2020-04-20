@@ -44,7 +44,8 @@ export default class UserTable implements IUserTable {
   }
 
   async findByName(firstName: string): Promise<IUser | null> {
-    return await this.database.findUserByName(firstName);
+    const users = await this.database.select('users', { first_name: firstName });
+    return users[0];
   }
 
   private titleCase(firstName: string): string {
@@ -55,6 +56,6 @@ export default class UserTable implements IUserTable {
   }
 
   async getAll(): Promise<IUser[]> {
-    return await this.database.getAllUsers();
+    return await this.database.select('users', {});
   }
 }

@@ -3,7 +3,7 @@ import { userTable } from '../../src/tables';
 import Postgres from '../../src/Postgres';
 
 describe('UserTable model', () => {
-  const postgres = new Postgres;
+  const postgres = new Postgres();
 
   before(async () => {
     await postgres.query('DELETE FROM transaction_users;');
@@ -23,7 +23,7 @@ describe('UserTable model', () => {
     it('should create a user and save name as Title Case', async () => {
       await userTable.create('User table model 1');
 
-      const user = await userTable.database.findUserByName('User Table Model 1');
+      const user = await userTable.findByName('User Table Model 1');
 
       if (user) {
         expect(user.first_name).to.equal('User Table Model 1');

@@ -1,5 +1,4 @@
 import { Pool, QueryResult } from 'pg';
-import { IUser } from './tables/UserTable';
 import fs from 'fs';
 
 interface IPoolConfig {
@@ -17,11 +16,14 @@ interface IPoolFileConfig {
   port: number;
 }
 
+interface IAttributes {
+  [key: string]: any;
+}
+
 export interface IDatabase {
   query(sql: string): Promise<QueryResult>;
-  findUserByName(firstName: string): Promise<IUser | null>;
-  getAllUsers(): Promise<IUser[]>;
-  insert(tableName: string, attributes: {}): Promise<any[]>;
+  insert(tableName: string, attributes: IAttributes): Promise<any[]>;
+  select(tableName: string, attributes: IAttributes): Promise<any[]>;
   end(): Promise<void>;
 }
 
@@ -103,15 +105,19 @@ export default class Postgres implements IPostgres {
     return created.rows;
   }
 
-  async findUserByName(firstName: string): Promise<IUser | null> {
-    const result: QueryResult = await this.query(`SELECT * FROM users WHERE first_name='${firstName}';`);
-    return result.rows[0];
-  }
+  async select(tableName: string, attributes: IAttributes): Promise<any[]> {
+    const whereArr = Object.keys(attributes).map((field) => {
+      let value: any = attributes[field];
+      if (typeof value === 'string') {
+        value = `'${value}'`;
+      }
+      return `${field}=${value}`;
+    });
 
-  async getAllUsers(): Promise<IUser[]> {
-    const result: QueryResult = await this.query('SELECT * FROM users;');
+    const whereStr = whereArr.length ? `WHERE ${whereArr.join(' AND ')}` : '';
 
-    return result.rows;
+    const results: QueryResult = await this.query(`SELECT * FROM ${tableName} ${whereStr};`);
+    return results.rows;
   }
 
   async end(): Promise<void> {
