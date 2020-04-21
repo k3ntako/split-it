@@ -1,7 +1,7 @@
-import IPage from './IPage';
-import { IUserIO } from '../CLI';
-import { IPrompter } from '../Prompter';
-import { IUser } from '../tables/UserTable';
+import IPage from '../IPage';
+import { IUserIO } from '../../CLI';
+import { IPrompter } from '../../Prompter';
+import { IUser } from '../../tables/UserTable';
 import chalk from 'chalk';
 
 export default class ViewBalancePage implements IPage {
