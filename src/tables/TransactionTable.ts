@@ -4,7 +4,7 @@ export interface ITransaction {
   id: number;
   name: string;
   cost: number;
-  date: Date;
+  date: Date | string;
 }
 
 export interface ITransactionUser {

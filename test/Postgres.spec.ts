@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Postgres, { IPostgres } from '../src/Postgres';
+import Postgres, { IPostgres, IWithId } from '../src/Postgres';
 import { userTable, transactionTable } from '../src/tables';
 import { IUser } from '../src/tables/UserTable';
 import { ITransaction, ITransactionUser } from '../src/tables/TransactionTable';
@@ -29,23 +29,6 @@ describe('Postgres', () => {
 
       const config = postgres.getConfig('test');
       expect(config).to.eql(expected);
-    });
-  });
-
-  describe('query', () => {
-    it('should get config for specified environment', () => {
-      let calledWith = null;
-
-      const query = (sql: any): any => {
-        calledWith = sql;
-      };
-
-      const postgresInstance = new Postgres();
-      postgresInstance.query = query;
-
-      postgresInstance.query('SELECT * FROM users;');
-
-      expect(calledWith).to.equal('SELECT * FROM users;');
     });
   });
 
@@ -106,7 +89,7 @@ describe('Postgres', () => {
   });
 
   describe('select', () => {
-    let energizer: IUser, duracell: IUser;
+    let energizer: IUser & IWithId, duracell: IUser & IWithId;
     before(async () => {
       await postgres.query('DELETE FROM transaction_users;');
       await postgres.query('DELETE FROM transactions;');
@@ -114,7 +97,7 @@ describe('Postgres', () => {
 
       energizer = await userTable.create('Energizer');
       duracell = await userTable.create('Duracell');
-      const eneloop: IUser = await userTable.create('Eneloop');
+      const eneloop: IUser & IWithId = await userTable.create('Eneloop');
       await transactionTable.create(energizer.id, duracell.id, 'Electric Bill', new Date(), 900);
       await transactionTable.create(energizer.id, duracell.id, 'Tesla', new Date(), 10000);
       await transactionTable.create(energizer.id, eneloop.id, 'Charge', new Date(), 1200);

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { userTable, transactionTable } from '../../src/tables';
 import Postgres from '../../src/Postgres';
 import { QueryResult } from 'pg';
-import { ITransactionUser, ITransaction } from '../../src/tables/TransactionTable';
+import { ITransactionUser } from '../../src/tables/TransactionTable';
 import { IUser } from '../../src/tables/UserTable';
 
 describe('UserTable model', () => {
@@ -122,44 +122,18 @@ describe('UserTable model', () => {
     });
 
     it('should randomly round up or down if an odd number is passed in', async () => {
-      const originalMethod = transactionTable.database.insert;
-      const passedInArgs: [[string, ITransaction]?, [string, ITransactionUser]?] = [];
+      const transaction = await transactionTable.create(user1.id, user2.id, name, date, 3.33);
 
-      try {
-        const mockMethod = async (
-          ...args: [string, ITransaction | ITransactionUser]
-        ): Promise<(ITransaction | ITransactionUser)[]> => {
-          const attributes: ITransaction | ITransactionUser = args[1];
+      const transactionUsers = await postgres.select('transaction_users', {
+        transaction_id: transaction.id,
+        lender_id: user1.id,
+        borrower_id: user2.id,
+      });
 
-          passedInArgs.push(args as [string, ITransaction] | [string, ITransactionUser]);
+      const amountOwed: number = transactionUsers[0].amount_owed;
 
-          return [attributes];
-        };
-
-        transactionTable.database.insert = mockMethod;
-
-        await transactionTable.create(user1.id, user2.id, name, date, 3.33);
-
-        const tableName: string | undefined =
-          passedInArgs && passedInArgs[1] && passedInArgs[1][0] && passedInArgs[1][0];
-        const attributes: ITransactionUser | undefined =
-          passedInArgs && passedInArgs[1] && passedInArgs[1][1] && passedInArgs[1][1];
-
-        if (!attributes) {
-          expect.fail("attributes don't exist");
-        }
-
-        const { amount_owed } = attributes;
-
-        const isValid = amount_owed === 166 || amount_owed === 167; // in cents
-
-        expect(isValid).to.be.true;
-        expect(tableName).to.equal('transaction_users');
-      } catch (error) {
-        throw error;
-      } finally {
-        transactionTable.database.insert = originalMethod;
-      }
+      const isValid: boolean = amountOwed === 166 || amountOwed === 167; // in cents
+      expect(isValid).to.be.true;
     });
   });
 });

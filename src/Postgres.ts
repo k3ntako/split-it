@@ -16,15 +16,16 @@ interface IPoolFileConfig {
   port: number;
 }
 
-interface IAttributes {
-  [key: string]: any;
-}
-
 export interface IDatabase {
   query(sql: string): Promise<QueryResult>;
-  insert(tableName: string, attributes: IAttributes): Promise<any[]>;
-  select(tableName: string, attributes: IAttributes): Promise<any[]>;
+  insert<T extends Record<string, any>>(tableName: string, attributes: T): Promise<(T & IWithId)[]>;
+  select(tableName: string, attributes: Record<string, any>): Promise<any[]>;
   end(): Promise<void>;
+}
+
+export interface IWithId {
+  id: number;
+  [key: string]: any;
 }
 
 export interface IPool extends Pool {
@@ -82,7 +83,7 @@ export default class Postgres implements IPostgres {
     return new Pool(config);
   }
 
-  async insert(tableName: string, attributes: any): Promise<any[]> {
+  async insert(tableName: string, attributes: Record<string, any>): Promise<any[]> {
     const fields = Object.keys(attributes);
     const fieldsStr: string = fields.join(', ');
 
@@ -105,7 +106,7 @@ export default class Postgres implements IPostgres {
     return created.rows;
   }
 
-  async select(tableName: string, attributes: IAttributes): Promise<any[]> {
+  async select(tableName: string, attributes: Record<string, any>): Promise<(Record<string, any> & IWithId)[]> {
     const whereArr = Object.keys(attributes).map((field) => {
       let value: any = attributes[field];
       if (typeof value === 'string') {
