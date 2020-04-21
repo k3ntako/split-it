@@ -1,4 +1,4 @@
-import { IDatabase } from '../Postgres';
+import { IDatabase } from '../PostgresQuery';
 
 export interface IUser {
   id: number;
@@ -6,16 +6,15 @@ export interface IUser {
 }
 
 export interface IUserTable {
-  database: IDatabase;
   create(firstName: string): Promise<IUser>;
   findByName(firstName: string): Promise<IUser | null>;
   getAll(): Promise<IUser[]>;
 }
 
 export default class UserTable implements IUserTable {
-  database: IDatabase;
-  constructor(database: IDatabase) {
-    this.database = database;
+  private databaseQuery: IDatabase;
+  constructor(databaseQuery: IDatabase) {
+    this.databaseQuery = databaseQuery;
   }
 
   async create(firstName: string): Promise<IUser> {
@@ -24,7 +23,11 @@ export default class UserTable implements IUserTable {
 
     await this.validate(firstName);
 
-    return await this.database.createUser(firstName);
+    const users = await this.databaseQuery.insert('users', {
+      first_name: firstName,
+    });
+
+    return users[0];
   }
 
   private async validate(firstName: string) {
@@ -40,14 +43,18 @@ export default class UserTable implements IUserTable {
   }
 
   async findByName(firstName: string): Promise<IUser | null> {
-    return await this.database.findUserByName(firstName);
+    const users = await this.databaseQuery.select('users', { first_name: firstName });
+    return users[0];
   }
 
   private titleCase(firstName: string): string {
-    return firstName.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ');
+    return firstName
+      .split(' ')
+      .map((n) => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase())
+      .join(' ');
   }
 
   async getAll(): Promise<IUser[]> {
-    return await this.database.getAllUsers();
+    return await this.databaseQuery.select('users', {});
   }
 }

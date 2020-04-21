@@ -1,29 +1,29 @@
 import { expect } from 'chai';
 import { userTable } from '../../src/tables';
-import Postgres from '../../src/Postgres';
+import PG_Interface from '../../src/PG_Interface';
 
 describe('UserTable model', () => {
-  const postgres = new Postgres;
+  const pgInterface = new PG_Interface();
 
   before(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
   });
 
   after(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
 
-    await postgres.end();
+    await pgInterface.end();
   });
 
   describe('create', () => {
     it('should create a user and save name as Title Case', async () => {
       await userTable.create('User table model 1');
 
-      const user = await userTable.database.findUserByName('User Table Model 1');
+      const user = await userTable.findByName('User Table Model 1');
 
       if (user) {
         expect(user.first_name).to.equal('User Table Model 1');

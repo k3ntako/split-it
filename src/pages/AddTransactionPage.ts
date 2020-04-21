@@ -23,7 +23,7 @@ export default class AddTransactionPage implements IPage {
     const otherUser: IUser | undefined = await this.getUser();
 
     if (!otherUser) {
-      throw Error('The other user cannot be undefined.')
+      throw Error('The other user cannot be undefined.');
     }
 
     const name: string = await this.getName();
@@ -56,7 +56,7 @@ export default class AddTransactionPage implements IPage {
     }, []);
 
     const answer: Answers = await this.prompter.promptList('Who was this transaction with?', choices);
-    return users.find(user => user.first_name === answer.action);
+    return users.find((user) => user.first_name === answer.action);
   }
 
   private async getName(): Promise<string> {
@@ -100,7 +100,7 @@ export default class AddTransactionPage implements IPage {
       const answer: Answers = await this.prompter.promptNumber('How much did it cost?');
       cost = answer.number;
 
-      if (!isNaN(cost) && cost > 0 && !(cost * 100 % 1)) {
+      if (!isNaN(cost) && cost > 0 && !((cost * 100) % 1)) {
         break;
       }
 

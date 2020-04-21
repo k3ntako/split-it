@@ -6,22 +6,22 @@ import MockCLI from './../mockClasses/mockCLI';
 import Prompter, { IPrompter, IQuestionOptions } from '../../src/Prompter';
 import { userTable } from '../../src/tables';
 import Separator from 'inquirer/lib/objects/separator';
-import Postgres from '../../src/Postgres';
+import PG_Interface from '../../src/PG_Interface';
 
 describe('LoginPage', () => {
-  const postgres = new Postgres;
+  const pgInterface = new PG_Interface();
 
   before(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
   });
 
   after(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
-    await postgres.end();
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
+    await pgInterface.end();
   });
 
   it('should ask user if they would like to create a new account', async () => {
