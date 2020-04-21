@@ -51,11 +51,11 @@ export default class TransactionTable implements ITransactionTable {
   }
 
   async getTransactionUser(userId: number): Promise<ITransactionUser[]> {
-    const lenders: ITransactionUser[] = await this.database.select('transaction_users', {
+    const lenders: ITransactionUser[] = await this.databaseQuery.select('transaction_users', {
       lender_id: userId,
     });
 
-    const borrows: ITransactionUser[] = await this.database.select('transaction_users', {
+    const borrows: ITransactionUser[] = await this.databaseQuery.select('transaction_users', {
       borrower_id: userId,
     });
 
