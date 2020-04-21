@@ -4,6 +4,8 @@ import PG_Interface from '../../../src/PG_Interface';
 import { IUser } from '../../../src/tables/UserTable';
 import { userTable, transactionTable } from '../../../src/tables';
 import { ITransactionUser } from '../../../src/tables/TransactionTable';
+import chalk from 'chalk';
+import BalanceFormatter from '../../../src/pages/ViewBalancePage/BalanceFormatter';
 
 let pgInterface: PG_Interface, activeUser: IUser, user2: IUser, user3: IUser, user4: IUser;
 
@@ -32,18 +34,17 @@ describe('BalanceCalculator', () => {
     await pgInterface.end();
   });
 
-  it('should return the amount the user owes and is owed', async () => {
+  it('should return the balance as an array of strings', async () => {
     const calc = new BalanceCalculator();
-
     const transactionUser: ITransactionUser[] = await transactionTable.getTransactionUser(activeUser.id);
-
     const balance = calc.calculateBalance(transactionUser, activeUser);
+    const users: IUser[] = await userTable.getAll();
 
-    expect(balance).to.exist;
-    expect(balance).to.be.an('object');
-    expect(balance).to.have.keys([user2.id, user3.id, user4.id]);
-    expect(balance[user2.id]).to.equal(51361);
-    expect(balance[user3.id]).to.equal(1100);
-    expect(balance[user4.id]).to.equal(-6020); // owes money
+    const balanceFormatter = new BalanceFormatter();
+    const balanceMessages = balanceFormatter.formatForPrint(balance, users);
+
+    expect(balanceMessages[0]).to.equal(`${user2.first_name} owes you ${chalk.green('$513.61')}`);
+    expect(balanceMessages[1]).to.equal(`${user3.first_name} owes you ${chalk.green('$11.00')}`);
+    expect(balanceMessages[2]).to.equal(`You owe ${user4.first_name} ${chalk.red('$60.20')}`);
   });
 });
