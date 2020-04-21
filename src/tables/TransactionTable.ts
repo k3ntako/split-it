@@ -55,11 +55,11 @@ export default class TransactionTable implements ITransactionTable {
       lender_id: userId,
     });
 
-    const borrows: ITransactionUser[] = await this.databaseQuery.select('transaction_users', {
+    const borrowers: ITransactionUser[] = await this.databaseQuery.select('transaction_users', {
       borrower_id: userId,
     });
 
-    return lenders.concat(borrows);
+    return lenders.concat(borrowers);
   }
 
   private validate(name: string, date: Date, cost: number) {

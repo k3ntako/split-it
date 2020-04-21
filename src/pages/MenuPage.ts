@@ -6,10 +6,12 @@ import AddTransactionPage from './AddTransactionPage';
 import { IUser } from '../tables/UserTable';
 import Separator from 'inquirer/lib/objects/separator';
 import ViewBalancePage from './ViewBalancePage';
+import BalanceCalculator from './ViewBalancePage/BalanceCalculator';
 
 interface INextPageOptions {
-  [key: string]: new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage;
-  'Add transaction': new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage;
+  [key: string]: IPage;
+  'Add transaction': IPage;
+  'View balance': IPage;
 }
 
 export default class MenuPage implements IPage {
@@ -23,8 +25,8 @@ export default class MenuPage implements IPage {
     this.prompter = prompter;
     this.user = user;
     this.nextPageOptions = {
-      'Add transaction': AddTransactionPage,
-      'View balance': ViewBalancePage,
+      'Add transaction': new AddTransactionPage(this.userIO, this.prompter, this.user),
+      'View balance': new ViewBalancePage(this.userIO, this.prompter, this.user, new BalanceCalculator()),
     };
   }
 
@@ -42,8 +44,6 @@ export default class MenuPage implements IPage {
       return null;
     }
 
-    const nextPage: new (userIO: IUserIO, prompter: IPrompter, user: IUser) => IPage = this.nextPageOptions[action];
-
-    return new nextPage(this.userIO, this.prompter, this.user);
+    return this.nextPageOptions[action];
   }
 }
