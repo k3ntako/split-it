@@ -7,6 +7,7 @@ import { transactionTable, userTable } from '../../tables';
 import { ITransactionUser } from '../../tables/TransactionTable';
 import BalanceCalculator from './BalanceCalculator';
 import BalanceFormatter from './BalanceFormatter';
+import MenuPage from '../MenuPage';
 
 export default class ViewBalancePage implements IPage {
   userIO: IUserIO;
@@ -44,6 +45,6 @@ export default class ViewBalancePage implements IPage {
 
     await this.prompter.promptList('Enter to return', ['Return to menu']);
 
-    return null;
+    return new MenuPage(this.userIO, this.prompter, this.user);
   }
 }

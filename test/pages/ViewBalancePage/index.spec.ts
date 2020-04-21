@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import MockCLI from '../../mockClasses/mockCLI';
 import Prompter, { IPrompter } from '../../../src/Prompter';
-
 import ViewBalancePage from '../../../src/pages/ViewBalancePage';
+import MenuPage from '../../../src/pages/MenuPage';
 import chalk from 'chalk';
 import { userTable, transactionTable } from '../../../src/tables';
 import PG_Interface from '../../../src/PG_Interface';
@@ -98,5 +98,23 @@ describe('ViewBalancePage', () => {
         choices: ['Return to menu'],
       },
     ]);
+  });
+
+  it('should ask user to return to main menu', async () => {
+    const mockCLI: MockCLI = new MockCLI();
+    mockCLI.promptMockAnswers = [{ action: 'Return to menu' }];
+    const prompter: IPrompter = new Prompter(mockCLI);
+
+    const viewBalancePage = new ViewBalancePage(
+      mockCLI,
+      prompter,
+      activeUser,
+      new BalanceCalculator(),
+      new BalanceFormatter(),
+    );
+
+    const nextPage = await viewBalancePage.display();
+
+    expect(nextPage).to.instanceOf(MenuPage);
   });
 });
