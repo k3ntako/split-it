@@ -1,22 +1,22 @@
 import { expect } from 'chai';
 import { userTable } from '../../src/tables';
-import Postgres from '../../src/Postgres';
+import PG_Interface from '../../src/PG_Interface';
 
 describe('UserTable model', () => {
-  const postgres = new Postgres();
+  const pgInterface = new PG_Interface();
 
   before(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
   });
 
   after(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
 
-    await postgres.end();
+    await pgInterface.end();
   });
 
   describe('create', () => {

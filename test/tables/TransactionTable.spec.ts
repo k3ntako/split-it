@@ -1,12 +1,14 @@
 import { expect } from 'chai';
 import { userTable, transactionTable } from '../../src/tables';
-import Postgres from '../../src/Postgres';
+import PG_Interface from '../../src/PG_Interface';
 import { QueryResult } from 'pg';
 import { ITransactionUser } from '../../src/tables/TransactionTable';
 import { IUser } from '../../src/tables/UserTable';
+import PostgresQuery from '../../src/PostgresQuery';
 
 describe('UserTable model', () => {
-  const postgres = new Postgres();
+  const pgInterface = new PG_Interface();
+  const postgresQuery = new PostgresQuery(pgInterface);
   let user1: IUser, user2: IUser;
 
   const name = 'Electric Bill';
@@ -14,19 +16,19 @@ describe('UserTable model', () => {
   const cost = 1020;
 
   before(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
 
     user1 = await userTable.create('Transaction Table 1');
     user2 = await userTable.create('Transaction Table 2');
   });
 
   after(async () => {
-    await postgres.query('DELETE FROM transaction_users;');
-    await postgres.query('DELETE FROM transactions;');
-    await postgres.query('DELETE FROM users;');
-    await postgres.end();
+    await pgInterface.query('DELETE FROM transaction_users;');
+    await pgInterface.query('DELETE FROM transactions;');
+    await pgInterface.query('DELETE FROM users;');
+    await pgInterface.end();
   });
 
   describe('create', () => {
@@ -35,7 +37,7 @@ describe('UserTable model', () => {
 
       expect(transaction).to.have.all.keys(['id', 'name', 'date', 'cost']);
 
-      const queryResult: QueryResult = await postgres.query('SELECT * FROM transaction_users;');
+      const queryResult: QueryResult = await pgInterface.query('SELECT * FROM transaction_users;');
       const transactionUser: ITransactionUser = queryResult.rows[0];
 
       if (transactionUser) {
@@ -124,7 +126,7 @@ describe('UserTable model', () => {
     it('should randomly round up or down if an odd number is passed in', async () => {
       const transaction = await transactionTable.create(user1.id, user2.id, name, date, 3.33);
 
-      const transactionUsers = await postgres.select('transaction_users', {
+      const transactionUsers = await postgresQuery.select('transaction_users', {
         transaction_id: transaction.id,
         lender_id: user1.id,
         borrower_id: user2.id,

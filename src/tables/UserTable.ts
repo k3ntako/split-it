@@ -1,4 +1,4 @@
-import { IDatabase } from '../Postgres';
+import { IDatabase } from '../PostgresQuery';
 
 export interface IUser {
   id: number;
@@ -6,16 +6,15 @@ export interface IUser {
 }
 
 export interface IUserTable {
-  database: IDatabase;
   create(firstName: string): Promise<IUser>;
   findByName(firstName: string): Promise<IUser | null>;
   getAll(): Promise<IUser[]>;
 }
 
 export default class UserTable implements IUserTable {
-  database: IDatabase;
-  constructor(database: IDatabase) {
-    this.database = database;
+  private databaseQuery: IDatabase;
+  constructor(databaseQuery: IDatabase) {
+    this.databaseQuery = databaseQuery;
   }
 
   async create(firstName: string): Promise<IUser> {
@@ -24,7 +23,7 @@ export default class UserTable implements IUserTable {
 
     await this.validate(firstName);
 
-    const users = await this.database.insert('users', {
+    const users = await this.databaseQuery.insert('users', {
       first_name: firstName,
     });
 
@@ -44,7 +43,7 @@ export default class UserTable implements IUserTable {
   }
 
   async findByName(firstName: string): Promise<IUser | null> {
-    const users = await this.database.select('users', { first_name: firstName });
+    const users = await this.databaseQuery.select('users', { first_name: firstName });
     return users[0];
   }
 
@@ -56,6 +55,6 @@ export default class UserTable implements IUserTable {
   }
 
   async getAll(): Promise<IUser[]> {
-    return await this.database.select('users', {});
+    return await this.databaseQuery.select('users', {});
   }
 }

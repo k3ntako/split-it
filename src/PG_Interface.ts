@@ -16,16 +16,9 @@ interface IPoolFileConfig {
   port: number;
 }
 
-export interface IDatabase {
+export interface IDatabaseInterface {
   query(sql: string): Promise<QueryResult>;
-  insert<T extends Record<string, any>>(tableName: string, attributes: T): Promise<(T & IWithId)[]>;
-  select(tableName: string, attributes: Record<string, any>): Promise<any[]>;
   end(): Promise<void>;
-}
-
-export interface IWithId {
-  id: number;
-  [key: string]: any;
 }
 
 export interface IPool extends Pool {
@@ -39,12 +32,12 @@ export interface IPool extends Pool {
   ended?: boolean;
 }
 
-export interface IPostgres extends IDatabase {
+export interface IPG_Interface extends IDatabaseInterface {
   getConfig(env: string): {};
   ended: boolean | undefined;
 }
 
-export default class Postgres implements IPostgres {
+export default class PG_Interface implements IPG_Interface {
   private pool: IPool;
 
   constructor() {
@@ -81,44 +74,6 @@ export default class Postgres implements IPostgres {
 
   private newPool(config: IPoolConfig): Pool {
     return new Pool(config);
-  }
-
-  async insert(tableName: string, attributes: Record<string, any>): Promise<any[]> {
-    const fields = Object.keys(attributes);
-    const fieldsStr: string = fields.join(', ');
-
-    const values = fields.map((field) => {
-      let attribute = attributes[field];
-
-      if (typeof attribute === 'string') {
-        attribute = `'${attribute}'`;
-      }
-
-      return attribute;
-    });
-
-    const valuesStr: string = values.join(', ');
-
-    const created: QueryResult = await this.query(
-      `INSERT INTO ${tableName} (${fieldsStr}) VALUES (${valuesStr}) RETURNING *;`,
-    );
-
-    return created.rows;
-  }
-
-  async select(tableName: string, attributes: Record<string, any>): Promise<(Record<string, any> & IWithId)[]> {
-    const whereArr = Object.keys(attributes).map((field) => {
-      let value: any = attributes[field];
-      if (typeof value === 'string') {
-        value = `'${value}'`;
-      }
-      return `${field}=${value}`;
-    });
-
-    const whereStr = whereArr.length ? `WHERE ${whereArr.join(' AND ')}` : '';
-
-    const results: QueryResult = await this.query(`SELECT * FROM ${tableName} ${whereStr};`);
-    return results.rows;
   }
 
   async end(): Promise<void> {

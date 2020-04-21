@@ -1,4 +1,4 @@
-import { IDatabase } from '../Postgres';
+import { IDatabase } from '../PostgresQuery';
 
 export interface ITransaction {
   id: number;
@@ -15,14 +15,13 @@ export interface ITransactionUser {
 }
 
 export interface ITransactionTable {
-  database: IDatabase;
   create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction>;
 }
 
 export default class TransactionTable implements ITransactionTable {
-  database: IDatabase;
-  constructor(database: IDatabase) {
-    this.database = database;
+  private databaseQuery: IDatabase;
+  constructor(databaseQuery: IDatabase) {
+    this.databaseQuery = databaseQuery;
   }
 
   async create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction> {
@@ -34,13 +33,13 @@ export default class TransactionTable implements ITransactionTable {
 
     const amountOwed: number = this.splitCost(cost);
 
-    const transactions: ITransaction[] = await this.database.insert('transactions', {
+    const transactions: ITransaction[] = await this.databaseQuery.insert('transactions', {
       name,
       date: dateStr,
       cost,
     });
 
-    await this.database.insert('transaction_users', {
+    await this.databaseQuery.insert('transaction_users', {
       transaction_id: transactions[0].id,
       lender_id: lenderId,
       borrower_id: borrowerId,

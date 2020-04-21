@@ -1,48 +1,35 @@
 import { expect } from 'chai';
-import Postgres, { IPostgres, IWithId } from '../src/Postgres';
+import PG_Interface from '../src/PG_Interface';
+import PostgresQuery, { IWithId } from '../src/PostgresQuery';
 import { userTable, transactionTable } from '../src/tables';
 import { IUser } from '../src/tables/UserTable';
 import { ITransaction, ITransactionUser } from '../src/tables/TransactionTable';
 
-let postgres: IPostgres;
+let pgInterface: PG_Interface, postgresQuery: PostgresQuery;
 
-describe('Postgres', () => {
+describe('PostgresQuery', () => {
   before(async () => {
-    postgres = new Postgres();
+    pgInterface = new PG_Interface();
+    postgresQuery = new PostgresQuery(pgInterface);
+
     await userTable.create('fun user');
   });
 
   after(async () => {
-    await postgres.end();
-  });
-
-  describe('getConfig', () => {
-    it('should get config for specified environment', () => {
-      const expected = {
-        driver: 'pg',
-        user: 'test_user',
-        password: '',
-        host: 'localhost',
-        database: 'split_it_test',
-        port: 5432,
-      };
-
-      const config = postgres.getConfig('test');
-      expect(config).to.eql(expected);
-    });
+    await pgInterface.end();
   });
 
   describe('insert', () => {
     before(async () => {
-      await postgres.query('DELETE FROM transaction_users;');
-      await postgres.query('DELETE FROM transactions;');
-      await postgres.query('DELETE FROM users;');
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
     });
 
     after(async () => {
-      await postgres.query('DELETE FROM transaction_users;');
-      await postgres.query('DELETE FROM transactions;');
-      await postgres.query('DELETE FROM users;');
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
     });
 
     it('should insert a new row in users', async () => {
@@ -50,12 +37,12 @@ describe('Postgres', () => {
         first_name: 'my name',
       };
 
-      const results: IUser[] = await postgres.insert('users', attributes);
+      const results: IUser[] = await postgresQuery.insert('users', attributes);
       expect(results).to.have.lengthOf(1);
       expect(results[0].id).to.be.a('number');
       expect(results[0].first_name).to.equal(attributes.first_name);
 
-      const users = await postgres.query("SELECT * FROM users WHERE first_name='my name';");
+      const users = await pgInterface.query("SELECT * FROM users WHERE first_name='my name';");
       expect(users.rows).to.have.lengthOf(1);
       expect(users.rows[0].id).to.be.a('number');
       expect(users.rows[0].first_name).to.equal(attributes.first_name);
@@ -72,14 +59,14 @@ describe('Postgres', () => {
         date: dateStr,
       };
 
-      const results: ITransaction[] = await postgres.insert('transactions', attributes);
+      const results: ITransaction[] = await postgresQuery.insert('transactions', attributes);
       expect(results).to.have.lengthOf(1);
       expect(results[0].id).to.be.a('number');
       expect(results[0].name).to.equal(attributes.name);
       expect(results[0].cost).to.equal(attributes.cost);
       expect(results[0].date).to.eql(date);
 
-      const transactions = await postgres.query('SELECT * FROM transactions;');
+      const transactions = await pgInterface.query('SELECT * FROM transactions;');
       expect(transactions.rows).to.have.lengthOf(1);
       expect(transactions.rows[0].id).to.be.a('number');
       expect(transactions.rows[0].name).to.equal(attributes.name);
@@ -91,9 +78,9 @@ describe('Postgres', () => {
   describe('select', () => {
     let energizer: IUser & IWithId, duracell: IUser & IWithId;
     before(async () => {
-      await postgres.query('DELETE FROM transaction_users;');
-      await postgres.query('DELETE FROM transactions;');
-      await postgres.query('DELETE FROM users;');
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
 
       energizer = await userTable.create('Energizer');
       duracell = await userTable.create('Duracell');
@@ -106,13 +93,13 @@ describe('Postgres', () => {
     });
 
     after(async () => {
-      await postgres.query('DELETE FROM transaction_users;');
-      await postgres.query('DELETE FROM transactions;');
-      await postgres.query('DELETE FROM users;');
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
     });
 
     it('should select all rows from specified table', async () => {
-      const results: IUser[] = await postgres.select('users', {});
+      const results: IUser[] = await postgresQuery.select('users', {});
       expect(results).to.have.lengthOf(3);
       expect(results[0].id).to.be.a('number');
       expect(results[0].first_name).to.equal('Energizer');
@@ -121,7 +108,7 @@ describe('Postgres', () => {
     });
 
     it('should select all rows from table that fulfill a criterion', async () => {
-      const results: IUser[] = await postgres.select('users', {
+      const results: IUser[] = await postgresQuery.select('users', {
         first_name: 'Energizer',
       });
       expect(results).to.have.lengthOf(1);
@@ -130,7 +117,7 @@ describe('Postgres', () => {
     });
 
     it('should select all rows from table that fulfill multiple criteria', async () => {
-      const results: ITransactionUser[] = await postgres.select('transaction_users', {
+      const results: ITransactionUser[] = await postgresQuery.select('transaction_users', {
         lender_id: energizer.id,
         amount_owed: 45000,
       });
@@ -138,22 +125,6 @@ describe('Postgres', () => {
       expect(results[0].lender_id).to.equal(energizer.id);
       expect(results[0].borrower_id).to.equal(duracell.id);
       expect(results[0].amount_owed).to.equal(45000);
-    });
-  });
-
-  describe('ended', () => {
-    it('should return if pool ended', () => {
-      const ended = postgres.ended;
-
-      expect(ended).to.be.false;
-    });
-  });
-
-  describe('end', () => {
-    it('should end pool', async () => {
-      await postgres.end();
-
-      expect(postgres.ended).to.be.true;
     });
   });
 });
