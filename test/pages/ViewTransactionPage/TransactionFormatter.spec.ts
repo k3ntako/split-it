@@ -3,19 +3,24 @@ import { transactionTable, userTable } from '../../../src/tables';
 import PG_Interface from '../../../src/PG_Interface';
 import { IUser } from '../../../src/tables/UserTable';
 import TransactionFormatter, {
-  TransactionsWithUsers,
+  ITransactionsWithUsers,
 } from '../../../src/pages/ViewTransactionPage/TransactionFormatter';
-// import chalk from 'chalk';
-import { QueryResult } from 'pg';
 import chalk from 'chalk';
+import PostgresQuery from '../../../src/PostgresQuery';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 describe('TransactionFormatter', () => {
-  let pgInterface: PG_Interface, activeUser: IUser, user2: IUser, user3: IUser, user4: IUser;
+  let pgInterface: PG_Interface,
+    postgresQuery: PostgresQuery,
+    activeUser: IUser,
+    user2: IUser,
+    user3: IUser,
+    user4: IUser;
 
   before(async () => {
     pgInterface = new PG_Interface();
+    postgresQuery = new PostgresQuery(pgInterface);
 
     activeUser = await userTable.create('ViewBalancePage 1');
     user2 = await userTable.create('ViewBalancePage 2');
@@ -41,30 +46,15 @@ describe('TransactionFormatter', () => {
   it('should format a transaction into a string and order by date (descending)', async () => {
     const transactionFormatter = new TransactionFormatter();
 
-    const results: QueryResult = await pgInterface.query(`
-      SELECT name AS transaction_name, cost, date, lender_name, borrower_name, amount_owed FROM transactions
-      JOIN (
-        SELECT users.first_name AS lender_name, tu_borrowers.* FROM users
-        JOIN (
-          SELECT users.first_name AS borrower_name, transaction_users.*  FROM users
-          JOIN transaction_users
-          ON transaction_users.borrower_id = users.id
-        ) as tu_borrowers
-        ON tu_borrowers.lender_id = users.id
-      ) AS tu_both
-      ON transactions.id = tu_both.transaction_id
-      AND (tu_both.lender_id=${activeUser.id} OR tu_both.borrower_id=${activeUser.id})
-      ORDER BY date DESC;
-    `);
+    const transactionsWithUsers: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(activeUser.id);
 
-    const transactionsWithUsers: TransactionsWithUsers[] = results.rows;
     const transactionStrings = await transactionFormatter.format(transactionsWithUsers, activeUser);
     expect(transactionStrings).to.be.an('array');
     expect(transactionStrings).to.have.lengthOf(5);
 
     expect(transactionStrings[0]).to.be.a('string');
 
-    const dates = transactionsWithUsers.map((row: TransactionsWithUsers) => {
+    const dates = transactionsWithUsers.map((row: ITransactionsWithUsers) => {
       const fullDate: Date = row.date;
       const dateStr: string = fullDate.getDate() < 10 ? `0${fullDate.getDate()}` : String(fullDate.getDate());
       return `${MONTHS[fullDate.getMonth()]} ${dateStr}, ${fullDate.getFullYear()}`;
