@@ -16,6 +16,7 @@ export interface ITransactionUser {
 
 export interface ITransactionTable {
   create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction>;
+  getTransactionUser(userId: number): Promise<ITransactionUser[]>;
 }
 
 export default class TransactionTable implements ITransactionTable {
@@ -47,6 +48,18 @@ export default class TransactionTable implements ITransactionTable {
     });
 
     return transactions[0];
+  }
+
+  async getTransactionUser(userId: number): Promise<ITransactionUser[]> {
+    const lenders: ITransactionUser[] = await this.databaseQuery.select('transaction_users', {
+      lender_id: userId,
+    });
+
+    const borrowers: ITransactionUser[] = await this.databaseQuery.select('transaction_users', {
+      borrower_id: userId,
+    });
+
+    return lenders.concat(borrowers);
   }
 
   private validate(name: string, date: Date, cost: number) {

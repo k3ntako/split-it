@@ -6,32 +6,40 @@ import { ITransactionUser } from '../../src/tables/TransactionTable';
 import { IUser } from '../../src/tables/UserTable';
 import PostgresQuery from '../../src/PostgresQuery';
 
-describe('UserTable model', () => {
-  const pgInterface = new PG_Interface();
-  const postgresQuery = new PostgresQuery(pgInterface);
-  let user1: IUser, user2: IUser;
+describe('TransactionTable model', () => {
+  let pgInterface: PG_Interface, postgresQuery: PostgresQuery;
 
-  const name = 'Electric Bill';
-  const date = new Date();
-  const cost = 1020;
-
-  before(async () => {
-    await pgInterface.query('DELETE FROM transaction_users;');
-    await pgInterface.query('DELETE FROM transactions;');
-    await pgInterface.query('DELETE FROM users;');
-
-    user1 = await userTable.create('Transaction Table 1');
-    user2 = await userTable.create('Transaction Table 2');
+  before(() => {
+    pgInterface = new PG_Interface();
+    postgresQuery = new PostgresQuery(pgInterface);
   });
 
   after(async () => {
-    await pgInterface.query('DELETE FROM transaction_users;');
-    await pgInterface.query('DELETE FROM transactions;');
-    await pgInterface.query('DELETE FROM users;');
     await pgInterface.end();
   });
 
   describe('create', () => {
+    let user1: IUser, user2: IUser;
+
+    const name = 'Electric Bill';
+    const date = new Date();
+    const cost = 1020;
+
+    before(async () => {
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
+
+      user1 = await userTable.create('Transaction Table 1');
+      user2 = await userTable.create('Transaction Table 2');
+    });
+
+    after(async () => {
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
+    });
+
     it('should create a Transaction and a TransactionUser', async () => {
       const transaction = await transactionTable.create(user1.id, user2.id, name, date, cost);
 
@@ -136,6 +144,41 @@ describe('UserTable model', () => {
 
       const isValid: boolean = amountOwed === 166 || amountOwed === 167; // in cents
       expect(isValid).to.be.true;
+    });
+  });
+
+  describe('getTransactionUser', () => {
+    let activeUser: IUser, user2: IUser, user3: IUser, user4: IUser;
+
+    before(async () => {
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
+
+      activeUser = await userTable.create('Transaction Table 1');
+      user2 = await userTable.create('Transaction Table 2');
+      user3 = await userTable.create('Transaction Table 3');
+      user4 = await userTable.create('Transaction Table 4');
+
+      await transactionTable.create(activeUser.id, user2.id, 'Lunch', new Date(), 100.93);
+      await transactionTable.create(user2.id, activeUser.id, 'Dinner', new Date(), 50.23);
+      await transactionTable.create(activeUser.id, user3.id, 'Electric Bill', new Date(), 35.11);
+      await transactionTable.create(user4.id, activeUser.id, 'Monopoly', new Date(), 22.12);
+      await transactionTable.create(user4.id, activeUser.id, 'Risk', new Date(), 33.33);
+      await transactionTable.create(user2.id, user3.id, 'Secret', new Date(), 88.95);
+    });
+
+    after(async () => {
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
+      await pgInterface.end();
+    });
+
+    it('should return all TransactionUsers for a user', async () => {
+      const transactionUsers: ITransactionUser[] = await transactionTable.getTransactionUser(activeUser.id);
+
+      expect(transactionUsers).to.have.lengthOf(5);
     });
   });
 });

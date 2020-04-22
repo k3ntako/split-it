@@ -13,7 +13,7 @@ describe('MenuPage', () => {
 
     const menuPage = new MenuPage(mockCLI, prompter, {
       id: 1,
-      first_name: 'Bob'
+      first_name: 'Bob',
     });
     await menuPage.display();
 
@@ -21,7 +21,7 @@ describe('MenuPage', () => {
     expect(arg.type).to.equal('list');
     expect(arg.name).to.equal('action');
     expect(arg.message).to.equal('Main menu:');
-    expect(arg.choices).to.eql(['Add transaction', new Separator(), 'Exit']);
+    expect(arg.choices).to.eql(['Add transaction', 'View balance', new Separator(), 'Exit']);
   });
 
   it('should return AddTransactionPage if user selects to add transaction', async () => {
@@ -31,7 +31,7 @@ describe('MenuPage', () => {
 
     const menuPage = new MenuPage(mockCLI, prompter, {
       id: 1,
-      first_name: 'Bob'
+      first_name: 'Bob',
     });
     const nextPage = await menuPage.display();
 
@@ -45,7 +45,7 @@ describe('MenuPage', () => {
 
     const menuPage = new MenuPage(mockCLI, prompter, {
       id: 1,
-      first_name: 'Bob'
+      first_name: 'Bob',
     });
     const nextPage = await menuPage.display();
 
