@@ -49,6 +49,7 @@ export default class TransactionUserInput {
 
     return name;
   }
+
   async getDate(): Promise<Date> {
     this.clearAndDisplayTitle();
 
@@ -71,7 +72,7 @@ export default class TransactionUserInput {
       const answer: Answers = await this.prompter.promptNumber('How much did it cost?');
       cost = answer.number;
 
-      if (!isNaN(cost) && cost > 0 && !((cost * 100) % 1)) {
+      if (this.isCostValid(cost)) {
         break;
       }
 
@@ -80,5 +81,18 @@ export default class TransactionUserInput {
     }
 
     return cost;
+  }
+
+  private isCostValid(cost: number): boolean {
+    const isPositiveNumber = typeof cost === 'number' && !isNaN(cost) && cost > 0;
+
+    if (!isPositiveNumber) {
+      return false;
+    } else if (!String(cost).includes('.')) {
+      return true;
+    } else {
+      const decimalPlaces = String(cost).split('.')[1].length;
+      return decimalPlaces <= 2;
+    }
   }
 }
