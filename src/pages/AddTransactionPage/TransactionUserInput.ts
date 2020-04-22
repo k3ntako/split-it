@@ -1,65 +1,37 @@
-import IPage from './IPage';
-import MenuPage from './MenuPage';
-import { IPrompter } from '../Prompter';
-import { IUserIO } from '../CLI';
+import { IPrompter } from '../../Prompter';
+import { IUserIO } from '../../CLI';
 import { Answers } from 'inquirer';
-import { userTable, transactionTable } from '../tables';
-import { IUser } from '../tables/UserTable';
+import { IUser } from '../../tables/UserTable';
 import chalk from 'chalk';
 
-export default class AddTransactionPage implements IPage {
-  userIO: IUserIO;
+export default class TransactionUserInput {
   prompter: IPrompter;
-  user: IUser;
+  userIO: IUserIO;
 
-  constructor(userIO: IUserIO, prompter: IPrompter, user: IUser) {
+  constructor(userIO: IUserIO, prompter: IPrompter) {
     this.userIO = userIO;
     this.prompter = prompter;
-    this.user = user;
   }
 
-  async display(): Promise<IPage> {
-    this.clearAndDisplayTitle();
-    const otherUser: IUser | undefined = await this.getUser();
-
-    if (!otherUser) {
-      throw Error('The other user cannot be undefined.');
-    }
-
-    const name: string = await this.getName();
-    const date: Date = await this.getDate();
-    const userPaid: boolean = await this.getUserPaid();
-    const cost: number = await this.getCost();
-
-    const [lender, borrower]: IUser[] = userPaid ? [this.user, otherUser] : [otherUser, this.user];
-
-    await transactionTable.create(lender.id, borrower.id, name, date, cost);
-
-    return new MenuPage(this.userIO, this.prompter, this.user);
-  }
-
-  private clearAndDisplayTitle(): void {
+  private clearAndDisplayTitle = (): void => {
     this.userIO.clear();
     this.userIO.print(chalk.bold('Add a Transaction\n'));
-  }
+  };
 
-  private async getUser(): Promise<IUser | undefined> {
-    this.clearAndDisplayTitle();
-
-    const users: IUser[] = await userTable.getAll();
-
+  async getUser(users: IUser[], activeUser: IUser): Promise<IUser | undefined> {
     const choices: string[] = users.reduce((acc: string[], user: IUser) => {
-      if (user.first_name !== this.user.first_name) {
+      if (user.first_name !== activeUser.first_name) {
         return acc.concat(user.first_name);
       }
       return acc;
     }, []);
 
+    this.clearAndDisplayTitle();
     const answer: Answers = await this.prompter.promptList('Who was this transaction with?', choices);
     return users.find((user) => user.first_name === answer.action);
   }
 
-  private async getName(): Promise<string> {
+  async getName(): Promise<string> {
     this.clearAndDisplayTitle();
 
     let name: string = '';
@@ -78,21 +50,21 @@ export default class AddTransactionPage implements IPage {
     return name;
   }
 
-  private async getDate(): Promise<Date> {
+  async getDate(): Promise<Date> {
     this.clearAndDisplayTitle();
 
     const answer: Answers = await this.prompter.promptDate('When was the transaction?');
     return answer.date;
   }
 
-  private async getUserPaid(): Promise<boolean> {
+  async getUserPaid(): Promise<boolean> {
     this.clearAndDisplayTitle();
 
     const answer: Answers = await this.prompter.promptConfirm('Did you pay for this?');
     return answer.confirmation;
   }
 
-  private async getCost(): Promise<number> {
+  async getCost(): Promise<number> {
     this.clearAndDisplayTitle();
 
     let cost: number = NaN;
@@ -100,7 +72,7 @@ export default class AddTransactionPage implements IPage {
       const answer: Answers = await this.prompter.promptNumber('How much did it cost?');
       cost = answer.number;
 
-      if (!isNaN(cost) && cost > 0 && !((cost * 100) % 1)) {
+      if (this.isCostValid(cost)) {
         break;
       }
 
@@ -109,5 +81,18 @@ export default class AddTransactionPage implements IPage {
     }
 
     return cost;
+  }
+
+  private isCostValid(cost: number): boolean {
+    const isPositiveNumber = typeof cost === 'number' && !isNaN(cost) && cost > 0;
+
+    if (!isPositiveNumber) {
+      return false;
+    } else if (!String(cost).includes('.')) {
+      return true;
+    } else {
+      const decimalPlaces = String(cost).split('.')[1].length;
+      return decimalPlaces <= 2;
+    }
   }
 }
