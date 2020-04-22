@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import AddTransactionPage from '../../src/pages/AddTransactionPage';
-import MenuPage from '../../src/pages/MenuPage';
-import MockCLI from '../mockClasses/mockCLI';
-import Prompter, { IPrompter, IQuestionOptions } from '../../src/Prompter';
-import PG_Interface from '../../src/PG_Interface';
-import { userTable, transactionTable } from '../../src/tables';
-import { IUser } from '../../src/tables/UserTable';
-import { ITransaction } from '../../src/tables/TransactionTable';
+import AddTransactionPage from '../../../src/pages/AddTransactionPage';
+import MenuPage from '../../../src/pages/MenuPage';
+import MockCLI from '../../mockClasses/mockCLI';
+import Prompter, { IPrompter, IQuestionOptions } from '../../../src/Prompter';
+import PG_Interface from '../../../src/PG_Interface';
+import { userTable, transactionTable } from '../../../src/tables';
+import { IUser } from '../../../src/tables/UserTable';
+import { ITransaction } from '../../../src/tables/TransactionTable';
 import chalk from 'chalk';
 
 describe('AddTransactionPage', () => {
@@ -48,7 +48,7 @@ describe('AddTransactionPage', () => {
   it('should clear screen prior to each question', async () => {
     await addTransactionPage.display();
 
-    expect(mockCLI.clearCallNum).to.equal(mockCLI.promptMockAnswers.length + 1);
+    expect(mockCLI.clearCallNum).to.equal(mockCLI.promptMockAnswers.length);
   });
 
   it('should display page title at top prior to each question', async () => {
@@ -57,7 +57,7 @@ describe('AddTransactionPage', () => {
     const expectedTitle: string = chalk.bold('Add a Transaction\n');
 
     const diplayTitleArgs = mockCLI.printArguments.filter((str) => str === expectedTitle);
-    expect(diplayTitleArgs).to.have.lengthOf(mockCLI.promptMockAnswers.length + 1);
+    expect(diplayTitleArgs).to.have.lengthOf(mockCLI.promptMockAnswers.length);
   });
 
   it('should ask user who else was involved in the transaction', async () => {
