@@ -4,7 +4,7 @@ import { userTable } from '../../tables';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export interface TransactionsWithUsers {
+export interface ITransactionsWithUsers {
   transaction_name: string;
   cost: number;
   date: Date;
@@ -16,7 +16,7 @@ export interface TransactionsWithUsers {
 export default class TransactionFormatter {
   constructor() {}
 
-  async format(transactionsWithUsers: TransactionsWithUsers[], activeUser: IUser): Promise<string[]> {
+  async format(transactionsWithUsers: ITransactionsWithUsers[], activeUser: IUser): Promise<string[]> {
     const users: IUser[] = await userTable.getAll();
 
     const transactionStrings: string[] = transactionsWithUsers.map((tu: any) => {
@@ -28,7 +28,7 @@ export default class TransactionFormatter {
     return transactionStrings;
   }
 
-  private getUserInvolved(tu: TransactionsWithUsers, users: IUser[], activeUser: IUser): IUser {
+  private getUserInvolved(tu: ITransactionsWithUsers, users: IUser[], activeUser: IUser): IUser {
     const user: IUser | undefined = users.find((u: IUser) => {
       return (
         (u.first_name === tu.lender_name || u.first_name === tu.borrower_name) && u.first_name !== activeUser.first_name
@@ -51,7 +51,7 @@ export default class TransactionFormatter {
     return `${monthStr} ${dateStr}, ${date.getFullYear()}`;
   }
 
-  private formatUserAndAmount(tu: TransactionsWithUsers, user: IUser, activeUser: IUser): string {
+  private formatUserAndAmount(tu: ITransactionsWithUsers, user: IUser, activeUser: IUser): string {
     const isLender = tu.lender_name === activeUser.first_name;
     const amount: number = tu.amount_owed;
     const formattedAmount = this.formatAmount(isLender, amount);
