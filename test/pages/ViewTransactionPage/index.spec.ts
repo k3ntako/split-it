@@ -24,9 +24,9 @@ describe('ViewBalancePage', () => {
     await transactionTable.create(user2.id, user3.id, 'Dinner', new Date('11/29/1900'), 51.88);
 
     // 5 transactions involving active user
-    await transactionTable.create(activeUser.id, user3.id, 'Trip to Canada', new Date('12/09/2030'), 10.1);
-    await transactionTable.create(user4.id, activeUser.id, 'SodaStream', new Date('3/09/2025'), 20.2);
     await transactionTable.create(user4.id, activeUser.id, 'Adopt Dog', new Date('11/12/2020'), 30.3);
+    await transactionTable.create(user4.id, activeUser.id, 'SodaStream', new Date('3/09/2025'), 20.2);
+    await transactionTable.create(activeUser.id, user3.id, 'Trip to Canada', new Date('12/09/2030'), 10.1);
     await transactionTable.create(activeUser.id, user3.id, 'Birthday Gift', new Date('8/7/2020'), 40.4);
     await transactionTable.create(activeUser.id, user2.id, 'Electricity Bill', new Date('3/22/2020'), 50.5);
   });
@@ -107,9 +107,10 @@ describe('ViewBalancePage', () => {
     await transactionTable.create(user2.id, user3.id, 'Dinner', new Date('11/29/1900'), 51.88);
 
     // 12 transactions involving active user
-    await transactionTable.create(activeUser.id, user3.id, 'Trip to Canada', new Date('12/09/2030'), 10.1);
-    await transactionTable.create(user4.id, activeUser.id, 'SodaStream', new Date('3/09/2025'), 20.2);
+    await transactionTable.create(activeUser.id, user2.id, 'Rent', new Date('05/27/1900'), 120.12);
     await transactionTable.create(user4.id, activeUser.id, 'Adopt Dog', new Date('11/12/2020'), 30.3);
+    await transactionTable.create(user4.id, activeUser.id, 'SodaStream', new Date('3/09/2025'), 20.2);
+    await transactionTable.create(activeUser.id, user3.id, 'Trip to Canada', new Date('12/09/2030'), 10.1);
     await transactionTable.create(activeUser.id, user3.id, 'Birthday Gift', new Date('8/7/2020'), 40.4);
     await transactionTable.create(activeUser.id, user2.id, 'Electricity Bill', new Date('3/22/2020'), 50.5);
     await transactionTable.create(user2.id, activeUser.id, 'Microwave', new Date('01/01/2020'), 60.6);
@@ -118,7 +119,6 @@ describe('ViewBalancePage', () => {
     await transactionTable.create(activeUser.id, user3.id, 'Lunch', new Date('12/09/2015'), 90.9);
     await transactionTable.create(user4.id, activeUser.id, 'Potato Chips', new Date('8/24/2012'), 100.1);
     await transactionTable.create(activeUser.id, user2.id, 'French Lessons', new Date('05/27/1973'), 110.1);
-    await transactionTable.create(activeUser.id, user2.id, 'Rent', new Date('05/27/1900'), 120.12);
   });
 
   after(async () => {
