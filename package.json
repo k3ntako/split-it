@@ -6,7 +6,8 @@
   "scripts": {
     "eslint": "eslint",
     "start": "node -r source-map-support/register ./dist/index.js",
-    "tsc_start": "npx tsc && npm start",
+    "tsc": "rm -rf ./dist && npx tsc",
+    "tsc_start": "npm run tsc && npm start",
     "test": "npm run dbDropTest; npm run dbCreateTest; npm run dbMigrateTest; NODE_ENV=test npm run test_mocha;",
     "test_mocha": "mocha -r ts-node/register './test/**/*.spec.ts' --recursive",
     "dbCreate": "psql -c 'CREATE DATABASE split_it'",
