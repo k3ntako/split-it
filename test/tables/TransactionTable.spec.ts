@@ -226,7 +226,7 @@ describe('TransactionTable model', () => {
     it('should return all TransactionUsers for a user', async () => {
       const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
         activeUser.id,
-        10,
+        null,
         null,
       );
 

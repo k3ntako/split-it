@@ -49,7 +49,7 @@ describe('TransactionFormatter', () => {
     const transactionsWithUsers: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(
       activeUser.id,
       null,
-      0,
+      null,
     );
 
     const transactionStrings = await transactionFormatter.format(transactionsWithUsers, activeUser);

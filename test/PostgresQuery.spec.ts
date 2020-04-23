@@ -153,7 +153,7 @@ describe('PostgresQuery', () => {
     });
 
     it('should return relevant columns from users, transactions_users, and transactions tables', async () => {
-      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, null, 0);
+      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, null, null);
       expect(results).to.be.an('array');
       expect(results).to.have.lengthOf(4);
       expect(results[0]).to.have.keys([
@@ -203,7 +203,7 @@ describe('PostgresQuery', () => {
     });
 
     it('should only return up to the limit specified', async () => {
-      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, 1, 0);
+      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, 1, null);
       expect(results).to.have.lengthOf(1);
     });
 
