@@ -56,3 +56,21 @@ Run tests:
 ```
   $ npm test
 ```
+
+## Future plans
+
+- Rethink router, because each page depends on another page, which is not ideal.
+- Refactor TransactionFormatter, so it can be used in multiple places
+- Helper methods for test to add rows and delete them.
+- Consider using email as their login, not name.
+- Multiple users to be involved in one transaction.
+- Add payments (paid what is owed).
+- Figure out how to most evenly distribute money.
+  - Currently, if the cost is odd, the extra penny is assigned randomly for each transaction,
+
+### Future future plans
+
+- Login with password
+- Save in cloud
+- Web interface
+- Upload receipt
