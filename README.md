@@ -66,7 +66,8 @@ Run tests:
 - Multiple users to be involved in one transaction.
 - Add payments (paid what is owed).
 - Figure out how to most evenly distribute money.
-  - Currently, if the cost is odd, the extra penny is assigned randomly for each transaction,
+  - Currently, if the cost is odd, the extra penny is assigned randomly for each transaction.
+- Edit/Delete transaction
 
 ### Future future plans
 
