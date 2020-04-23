@@ -130,7 +130,7 @@ describe('PostgresQuery', () => {
   });
 
   describe('transactionsWithUsers', () => {
-    let energizer: IUser & IWithId, duracell: IUser & IWithId;
+    let energizer: IUser & IWithId, duracell: IUser & IWithId, eneloop: IUser & IWithId;
     before(async () => {
       await pgInterface.query('DELETE FROM transaction_users;');
       await pgInterface.query('DELETE FROM transactions;');
@@ -138,7 +138,7 @@ describe('PostgresQuery', () => {
 
       energizer = await userTable.create('Energizer');
       duracell = await userTable.create('Duracell');
-      const eneloop: IUser & IWithId = await userTable.create('Eneloop');
+      eneloop = await userTable.create('Eneloop');
       await transactionTable.create(energizer.id, duracell.id, 'Electric Bill', new Date('1/11/2012'), 900);
       await transactionTable.create(energizer.id, duracell.id, 'Tesla', new Date('3/25/3020'), 10000);
       await transactionTable.create(energizer.id, eneloop.id, 'Charge', new Date('9/29/2009'), 1200);
@@ -153,7 +153,7 @@ describe('PostgresQuery', () => {
     });
 
     it('should return relevant columns from users, transactions_users, and transactions tables', async () => {
-      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id);
+      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, null, 0);
       expect(results).to.be.an('array');
       expect(results).to.have.lengthOf(4);
       expect(results[0]).to.have.keys([
@@ -200,6 +200,31 @@ describe('PostgresQuery', () => {
         borrower_name: 'Energizer',
         amount_owed: 75000,
       });
+    });
+
+    it('should only return up to the limit specified', async () => {
+      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, 1, 0);
+      expect(results).to.have.lengthOf(1);
+    });
+
+    it('should start counting towards its limit after its offset', async () => {
+      // Total of 12 transactions for active user (energizer)
+      await transactionTable.create(energizer.id, duracell.id, 'Electric Bill', new Date('1/11/2012'), 900);
+      await transactionTable.create(energizer.id, duracell.id, 'Tesla', new Date('3/25/3020'), 10000);
+      await transactionTable.create(energizer.id, eneloop.id, 'Charge', new Date('9/29/2009'), 1200);
+      await transactionTable.create(duracell.id, energizer.id, 'Light bulb', new Date('12/09/1932'), 1500);
+      await transactionTable.create(energizer.id, duracell.id, 'Electric Bill', new Date('1/11/2012'), 900);
+      await transactionTable.create(energizer.id, duracell.id, 'Tesla', new Date('3/25/3020'), 10000);
+      await transactionTable.create(energizer.id, eneloop.id, 'Charge', new Date('9/29/2009'), 1200);
+      await transactionTable.create(duracell.id, energizer.id, 'Light bulb', new Date('12/09/1932'), 1500);
+
+      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, null, 10);
+      expect(results).to.have.lengthOf(2);
+    });
+
+    it('should be able to LIMIT and OFFSET', async () => {
+      const results: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(energizer.id, 1, 10);
+      expect(results).to.have.lengthOf(1);
     });
   });
 });

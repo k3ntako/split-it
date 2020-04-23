@@ -226,6 +226,8 @@ describe('TransactionTable model', () => {
     it('should return all TransactionUsers for a user', async () => {
       const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
         activeUser.id,
+        10,
+        null,
       );
 
       expect(transactionsWithUsers).to.have.lengthOf(5);
@@ -235,6 +237,26 @@ describe('TransactionTable model', () => {
 
       const transactionNames = transactionsWithUsers.map((tu) => tu.transaction_name);
       expect(transactionNames).to.have.all.members(transactionNamesForActiveUser);
+    });
+
+    it('should only return at most the number of rows specified', async () => {
+      const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
+        activeUser.id,
+        2,
+        null,
+      );
+
+      expect(transactionsWithUsers).to.have.lengthOf(2);
+    });
+
+    it('should start counting towards its limit after its offset', async () => {
+      const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
+        activeUser.id,
+        null,
+        2,
+      );
+
+      expect(transactionsWithUsers).to.have.lengthOf(3);
     });
   });
 });

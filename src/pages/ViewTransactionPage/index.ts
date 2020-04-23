@@ -5,6 +5,7 @@ import { IUser } from '../../tables/UserTable';
 import chalk from 'chalk';
 import TransactionFormatter, { ITransactionsWithUsers } from './TransactionFormatter';
 import { transactionTable } from '../../tables';
+import MenuPage from '../MenuPage';
 
 export default class ViewBalancePage implements IPage {
   userIO: IUserIO;
@@ -25,10 +26,14 @@ export default class ViewBalancePage implements IPage {
 
     const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
       this.user.id,
+      10,
+      null,
     );
     const transactionStrings: string[] = await this.transactionFormatter.format(transactionsWithUsers, this.user);
     transactionStrings.forEach((ts) => this.userIO.print(ts));
 
-    return null;
+    await this.prompter.promptList('Enter to return', ['Return to menu']);
+
+    return new MenuPage(this.userIO, this.prompter, this.user);
   }
 }

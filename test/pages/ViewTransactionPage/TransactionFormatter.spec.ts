@@ -46,7 +46,11 @@ describe('TransactionFormatter', () => {
   it('should format a transaction into a string and order by date (descending)', async () => {
     const transactionFormatter = new TransactionFormatter();
 
-    const transactionsWithUsers: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(activeUser.id);
+    const transactionsWithUsers: ITransactionsWithUsers[] = await postgresQuery.transactionsWithUsers(
+      activeUser.id,
+      null,
+      0,
+    );
 
     const transactionStrings = await transactionFormatter.format(transactionsWithUsers, activeUser);
     expect(transactionStrings).to.be.an('array');

@@ -10,7 +10,7 @@ export interface IWithId {
 export interface IDatabase {
   insert<T extends Record<string, any>>(tableName: string, attributes: T): Promise<(T & IWithId)[]>;
   select(tableName: string, attributes: Record<string, any>): Promise<any[]>;
-  transactionsWithUsers(userId: number): Promise<ITransactionsWithUsers[]>;
+  transactionsWithUsers(userId: number, limit: number | null, offset: number | null): Promise<ITransactionsWithUsers[]>;
 }
 
 export default class PostgresQuery implements IDatabase {
@@ -58,7 +58,14 @@ export default class PostgresQuery implements IDatabase {
     return results.rows;
   }
 
-  async transactionsWithUsers(userId: number): Promise<ITransactionsWithUsers[]> {
+  async transactionsWithUsers(
+    userId: number,
+    limit: number | null,
+    offset: number | null,
+  ): Promise<ITransactionsWithUsers[]> {
+    const limitText: string = limit ? `LIMIT ${limit}` : '';
+    const offsetText: string = offset ? `OFFSET ${offset}` : '';
+
     const results: QueryResult = await this.pgInterface.query(`
       SELECT name AS transaction_name, cost, date, lender_name, borrower_name, amount_owed FROM transactions
       JOIN (
@@ -72,7 +79,9 @@ export default class PostgresQuery implements IDatabase {
       ) AS tu_both
       ON transactions.id = tu_both.transaction_id
       AND (tu_both.lender_id=${userId} OR tu_both.borrower_id=${userId})
-      ORDER BY date DESC;
+      ORDER BY date DESC
+      ${limitText}
+      ${offsetText};
     `);
 
     return results.rows;
