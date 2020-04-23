@@ -1,5 +1,6 @@
 import { QueryResult } from 'pg';
 import PG_Interface from './PG_Interface';
+import { ITransactionsWithUsers } from './pages/ViewTransactionPage/TransactionFormatter';
 
 export interface IWithId {
   id: number;
@@ -9,6 +10,7 @@ export interface IWithId {
 export interface IDatabase {
   insert<T extends Record<string, any>>(tableName: string, attributes: T): Promise<(T & IWithId)[]>;
   select(tableName: string, attributes: Record<string, any>): Promise<any[]>;
+  transactionsWithUsers(userId: number, limit: number | null, offset: number | null): Promise<ITransactionsWithUsers[]>;
 }
 
 export default class PostgresQuery implements IDatabase {
@@ -53,6 +55,35 @@ export default class PostgresQuery implements IDatabase {
     const whereStr = whereArr.length ? `WHERE ${whereArr.join(' AND ')}` : '';
 
     const results: QueryResult = await this.pgInterface.query(`SELECT * FROM ${tableName} ${whereStr};`);
+    return results.rows;
+  }
+
+  async transactionsWithUsers(
+    userId: number,
+    limit: number | null,
+    offset: number | null,
+  ): Promise<ITransactionsWithUsers[]> {
+    const limitText: string = limit ? `LIMIT ${limit}` : '';
+    const offsetText: string = offset ? `OFFSET ${offset}` : '';
+
+    const results: QueryResult = await this.pgInterface.query(`
+      SELECT name AS transaction_name, cost, date, lender_name, borrower_name, amount_owed FROM transactions
+      JOIN (
+        SELECT users.first_name AS lender_name, tu_borrowers.* FROM users
+        JOIN (
+          SELECT users.first_name AS borrower_name, transaction_users.*  FROM users
+          JOIN transaction_users
+          ON transaction_users.borrower_id = users.id
+        ) as tu_borrowers
+        ON tu_borrowers.lender_id = users.id
+      ) AS tu_both
+      ON transactions.id = tu_both.transaction_id
+      AND (tu_both.lender_id=${userId} OR tu_both.borrower_id=${userId})
+      ORDER BY date DESC
+      ${limitText}
+      ${offsetText};
+    `);
+
     return results.rows;
   }
 }

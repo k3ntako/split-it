@@ -5,6 +5,7 @@ import { QueryResult } from 'pg';
 import { ITransactionUser } from '../../src/tables/TransactionTable';
 import { IUser } from '../../src/tables/UserTable';
 import PostgresQuery from '../../src/PostgresQuery';
+import { ITransactionsWithUsers } from '../../src/pages/ViewTransactionPage/TransactionFormatter';
 
 describe('TransactionTable model', () => {
   let pgInterface: PG_Interface, postgresQuery: PostgresQuery;
@@ -149,6 +150,7 @@ describe('TransactionTable model', () => {
 
   describe('getTransactionUser', () => {
     let activeUser: IUser, user2: IUser, user3: IUser, user4: IUser;
+    let transactionIdsForActiveUser: number[];
 
     before(async () => {
       await pgInterface.query('DELETE FROM transaction_users;');
@@ -160,12 +162,58 @@ describe('TransactionTable model', () => {
       user3 = await userTable.create('Transaction Table 3');
       user4 = await userTable.create('Transaction Table 4');
 
-      await transactionTable.create(activeUser.id, user2.id, 'Lunch', new Date(), 100.93);
-      await transactionTable.create(user2.id, activeUser.id, 'Dinner', new Date(), 50.23);
-      await transactionTable.create(activeUser.id, user3.id, 'Electric Bill', new Date(), 35.11);
-      await transactionTable.create(user4.id, activeUser.id, 'Monopoly', new Date(), 22.12);
-      await transactionTable.create(user4.id, activeUser.id, 'Risk', new Date(), 33.33);
+      const t1 = await transactionTable.create(activeUser.id, user2.id, 'Lunch', new Date(), 100.93);
+      const t2 = await transactionTable.create(user2.id, activeUser.id, 'Dinner', new Date(), 50.23);
+      const t3 = await transactionTable.create(activeUser.id, user3.id, 'Electric Bill', new Date(), 35.11);
+      const t4 = await transactionTable.create(user4.id, activeUser.id, 'Monopoly', new Date(), 22.12);
+      const t5 = await transactionTable.create(user4.id, activeUser.id, 'Risk', new Date(), 33.33);
       await transactionTable.create(user2.id, user3.id, 'Secret', new Date(), 88.95);
+      transactionIdsForActiveUser = [t1.id, t2.id, t3.id, t4.id, t5.id];
+    });
+
+    after(async () => {
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
+    });
+
+    it('should return all TransactionUsers for a user', async () => {
+      const transactionUsers: ITransactionUser[] = await transactionTable.getTransactionUser(activeUser.id);
+
+      expect(transactionUsers).to.have.lengthOf(5);
+
+      transactionUsers.forEach((tu) => {
+        expect(tu).to.have.keys(['transaction_id', 'borrower_id', 'lender_id', 'amount_owed']);
+      });
+
+      expect(transactionUsers[0]).to.have.keys(['transaction_id', 'borrower_id', 'lender_id', 'amount_owed']);
+
+      const transactionIds = transactionUsers.map((tu) => tu.transaction_id);
+      expect(transactionIds).to.have.all.members(transactionIdsForActiveUser);
+    });
+  });
+
+  describe('getTransactionsWithUsers', () => {
+    let activeUser: IUser, user2: IUser, user3: IUser, user4: IUser;
+    let transactionNamesForActiveUser: string[];
+
+    before(async () => {
+      await pgInterface.query('DELETE FROM transaction_users;');
+      await pgInterface.query('DELETE FROM transactions;');
+      await pgInterface.query('DELETE FROM users;');
+
+      activeUser = await userTable.create('Transaction Table 1');
+      user2 = await userTable.create('Transaction Table 2');
+      user3 = await userTable.create('Transaction Table 3');
+      user4 = await userTable.create('Transaction Table 4');
+
+      const t1 = await transactionTable.create(activeUser.id, user2.id, 'Lunch', new Date(), 100.93);
+      const t2 = await transactionTable.create(user2.id, activeUser.id, 'Dinner', new Date(), 50.23);
+      const t3 = await transactionTable.create(activeUser.id, user3.id, 'Electric Bill', new Date(), 35.11);
+      const t4 = await transactionTable.create(user4.id, activeUser.id, 'Monopoly', new Date(), 22.12);
+      const t5 = await transactionTable.create(user4.id, activeUser.id, 'Risk', new Date(), 33.33);
+      await transactionTable.create(user2.id, user3.id, 'Secret', new Date(), 88.95);
+      transactionNamesForActiveUser = [t1.name, t2.name, t3.name, t4.name, t5.name];
     });
 
     after(async () => {
@@ -176,9 +224,39 @@ describe('TransactionTable model', () => {
     });
 
     it('should return all TransactionUsers for a user', async () => {
-      const transactionUsers: ITransactionUser[] = await transactionTable.getTransactionUser(activeUser.id);
+      const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
+        activeUser.id,
+        null,
+        null,
+      );
 
-      expect(transactionUsers).to.have.lengthOf(5);
+      expect(transactionsWithUsers).to.have.lengthOf(5);
+      transactionsWithUsers.forEach((tu) => {
+        expect(tu).to.have.keys(['transaction_name', 'cost', 'date', 'lender_name', 'borrower_name', 'amount_owed']);
+      });
+
+      const transactionNames = transactionsWithUsers.map((tu) => tu.transaction_name);
+      expect(transactionNames).to.have.all.members(transactionNamesForActiveUser);
+    });
+
+    it('should only return at most the number of rows specified', async () => {
+      const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
+        activeUser.id,
+        2,
+        null,
+      );
+
+      expect(transactionsWithUsers).to.have.lengthOf(2);
+    });
+
+    it('should start counting towards its limit after its offset', async () => {
+      const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
+        activeUser.id,
+        null,
+        2,
+      );
+
+      expect(transactionsWithUsers).to.have.lengthOf(3);
     });
   });
 });

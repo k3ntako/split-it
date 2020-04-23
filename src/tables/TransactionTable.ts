@@ -1,4 +1,5 @@
 import { IDatabase } from '../PostgresQuery';
+import { ITransactionsWithUsers } from '../pages/ViewTransactionPage/TransactionFormatter';
 
 export interface ITransaction {
   id: number;
@@ -17,6 +18,11 @@ export interface ITransactionUser {
 export interface ITransactionTable {
   create(lenderId: number, borrowerId: number, name: string, date: Date, cost: number): Promise<ITransaction>;
   getTransactionUser(userId: number): Promise<ITransactionUser[]>;
+  getTransactionsWithUsers(
+    userId: number,
+    limit: number | null,
+    offset: number | null,
+  ): Promise<ITransactionsWithUsers[]>;
 }
 
 export default class TransactionTable implements ITransactionTable {
@@ -60,6 +66,14 @@ export default class TransactionTable implements ITransactionTable {
     });
 
     return lenders.concat(borrowers);
+  }
+
+  async getTransactionsWithUsers(
+    userId: number,
+    limit: number | null,
+    offset: number | null,
+  ): Promise<ITransactionsWithUsers[]> {
+    return this.databaseQuery.transactionsWithUsers(userId, limit, offset);
   }
 
   private validate(name: string, date: Date, cost: number) {
