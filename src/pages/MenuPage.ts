@@ -6,6 +6,7 @@ import AddTransactionPage from './AddTransactionPage';
 import { IUser } from '../tables/UserTable';
 import Separator from 'inquirer/lib/objects/separator';
 import ViewBalancePage from './ViewBalancePage';
+import ViewTransactionPage from './ViewTransactionPage';
 import BalanceCalculator from './ViewBalancePage/BalanceCalculator';
 import BalanceFormatter from './ViewBalancePage/BalanceFormatter';
 
@@ -34,6 +35,7 @@ export default class MenuPage implements IPage {
         new BalanceCalculator(),
         new BalanceFormatter(),
       ),
+      'View transactions': new ViewTransactionPage(this.userIO, this.prompter, this.user),
     };
   }
 

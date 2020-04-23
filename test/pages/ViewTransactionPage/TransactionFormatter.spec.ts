@@ -63,19 +63,19 @@ describe('TransactionFormatter', () => {
     const names = transactionsWithUsers.map((row) => row.transaction_name);
 
     expect(transactionStrings[0]).to.equal(
-      `${dates[0]} ${names[0]}\nYou owe ${user4.first_name} ${chalk.red('$60.20')}`,
+      `${dates[0]} ${names[0]}\nYou owe ${user4.first_name} ${chalk.red('$60.20')}\n`,
     );
     expect(transactionStrings[1]).to.equal(
-      `${dates[1]} ${names[1]}\n${user2.first_name} owes you ${chalk.green('$25.56')}`,
+      `${dates[1]} ${names[1]}\n${user2.first_name} owes you ${chalk.green('$25.56')}\n`,
     );
     expect(transactionStrings[2]).to.equal(
-      `${dates[2]} ${names[2]}\nYou owe ${user2.first_name} ${chalk.red('$11.95')}`,
+      `${dates[2]} ${names[2]}\nYou owe ${user2.first_name} ${chalk.red('$11.95')}\n`,
     );
     expect(transactionStrings[3]).to.equal(
-      `${dates[3]} ${names[3]}\n${user3.first_name} owes you ${chalk.green('$11.00')}`,
+      `${dates[3]} ${names[3]}\n${user3.first_name} owes you ${chalk.green('$11.00')}\n`,
     );
     expect(transactionStrings[4]).to.equal(
-      `${dates[4]} ${names[4]}\n${user2.first_name} owes you ${chalk.green('$500.00')}`,
+      `${dates[4]} ${names[4]}\n${user2.first_name} owes you ${chalk.green('$500.00')}\n`,
     );
   });
 });

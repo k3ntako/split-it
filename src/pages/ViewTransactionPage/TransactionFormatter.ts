@@ -22,7 +22,7 @@ export default class TransactionFormatter {
     const transactionStrings: string[] = transactionsWithUsers.map((tu: any) => {
       const user = this.getUserInvolved(tu, users, activeUser);
       const amountStr = this.formatUserAndAmount(tu, user, activeUser);
-      return `${this.formatDateStr(tu.date)} ${tu.transaction_name}\n${amountStr}`;
+      return `${this.formatDateStr(tu.date)} ${tu.transaction_name}\n${amountStr}\n`;
     });
 
     return transactionStrings;
