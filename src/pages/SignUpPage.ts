@@ -1,10 +1,10 @@
-import IPage from "./IPage";
-import { Answers } from "inquirer";
+import IPage from './IPage';
+import { Answers } from 'inquirer';
 import { userTable } from '../tables';
-import { IUser } from "../tables/UserTable";
-import { IUserIO } from "../CLI";
-import { IPrompter } from "../Prompter";
-import MenuPage from "./MenuPage";
+import { IUser } from '../tables/UserTable';
+import { IUserIO } from '../CLI';
+import { IPrompter } from '../Prompter';
+import MenuPage from './MenuPage';
 
 export default class SignUpPage implements IPage {
   userIO: IUserIO;
@@ -15,15 +15,21 @@ export default class SignUpPage implements IPage {
     this.prompter = prompter;
   }
 
-  async display(): Promise<IPage> {
+  async execute(): Promise<IPage> {
     this.userIO.clear();
 
+    const user: IUser = await this.createUser();
+
+    return this.routePage(user);
+  }
+
+  private async createUser(): Promise<IUser> {
     let isValid: boolean = false;
     let user: IUser | null = null;
 
     while (!isValid) {
       try {
-        const nameAnswer: Answers = await this.prompter.promptText('What\'s your name?');
+        const nameAnswer: Answers = await this.promptName();
         const firstName: string = nameAnswer.input;
 
         user = await userTable.create(firstName);
@@ -39,6 +45,14 @@ export default class SignUpPage implements IPage {
       throw new Error('No user created');
     }
 
+    return user;
+  }
+
+  private async promptName(): Promise<Answers> {
+    return await this.prompter.promptText("What's your name?");
+  }
+
+  private routePage(user: IUser): IPage {
     return new MenuPage(this.userIO, this.prompter, user);
   }
 }

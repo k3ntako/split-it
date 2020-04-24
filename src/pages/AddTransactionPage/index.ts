@@ -19,14 +19,31 @@ export default class AddTransactionPage implements IPage {
     this.transactionUserInput = new TransactionUserInput(userIO, prompter);
   }
 
-  async display(): Promise<IPage> {
-    const users: IUser[] = await userTable.getAll();
-    const otherUser: IUser | undefined = await this.transactionUserInput.getUser(users, this.user);
+  async execute(): Promise<IPage> {
+    const users: IUser[] = await this.getUsers();
+    const otherUser: IUser = await this.getOtherUser(users);
+
+    const { lenderId, borrowerId, name, date, cost } = await this.promptTransactionParams(otherUser);
+    await this.createTransaction(lenderId, borrowerId, name, date, cost);
+
+    return this.routePage();
+  }
+
+  private async getUsers(): Promise<IUser[]> {
+    return await userTable.getAll();
+  }
+
+  private async getOtherUser(users: IUser[]): Promise<IUser> {
+    const otherUser = await this.transactionUserInput.getUser(users, this.user);
 
     if (!otherUser) {
       throw Error('The other user cannot be undefined.');
     }
 
+    return otherUser;
+  }
+
+  private async promptTransactionParams(otherUser: IUser) {
     const name: string = await this.transactionUserInput.getName();
     const date: Date = await this.transactionUserInput.getDate();
     const userPaid: boolean = await this.transactionUserInput.getUserPaid();
@@ -34,8 +51,20 @@ export default class AddTransactionPage implements IPage {
 
     const [lender, borrower]: IUser[] = userPaid ? [this.user, otherUser] : [otherUser, this.user];
 
-    await transactionTable.create(lender.id, borrower.id, name, date, cost);
+    return {
+      lenderId: lender.id,
+      borrowerId: borrower.id,
+      name,
+      date,
+      cost,
+    };
+  }
 
+  private async createTransaction(lenderId: number, borrowerId: number, name: string, date: Date, cost: number) {
+    await transactionTable.create(lenderId, borrowerId, name, date, cost);
+  }
+
+  private routePage(): IPage {
     return new MenuPage(this.userIO, this.prompter, this.user);
   }
 }

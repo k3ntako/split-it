@@ -17,7 +17,7 @@ describe('MenuPage', () => {
       id: 1,
       first_name: 'Bob',
     });
-    await menuPage.display();
+    await menuPage.execute();
 
     const arg: IQuestionOptions = mockCLI.promptArguments[0];
     expect(arg.type).to.equal('list');
@@ -35,7 +35,7 @@ describe('MenuPage', () => {
       id: 1,
       first_name: 'Bob',
     });
-    const nextPage = await menuPage.display();
+    const nextPage = await menuPage.execute();
 
     expect(nextPage).to.be.an.instanceOf(AddTransactionPage);
   });
@@ -49,7 +49,7 @@ describe('MenuPage', () => {
       id: 1,
       first_name: 'Bob',
     });
-    const nextPage = await menuPage.display();
+    const nextPage = await menuPage.execute();
 
     expect(nextPage).to.be.an.instanceOf(ViewBalancePage);
   });
@@ -63,7 +63,7 @@ describe('MenuPage', () => {
       id: 1,
       first_name: 'Bob',
     });
-    const nextPage = await menuPage.display();
+    const nextPage = await menuPage.execute();
 
     expect(nextPage).to.be.an.instanceOf(ViewTransactionPage);
   });
@@ -77,7 +77,7 @@ describe('MenuPage', () => {
       id: 1,
       first_name: 'Bob',
     });
-    const nextPage = await menuPage.display();
+    const nextPage = await menuPage.execute();
 
     expect(nextPage).to.be.null;
   });

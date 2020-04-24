@@ -1,4 +1,4 @@
-import IPage from "../../src/pages/IPage";
+import IPage from '../../src/pages/IPage';
 
 export default class MockPage implements IPage {
   displayCallNum: number;
@@ -9,7 +9,7 @@ export default class MockPage implements IPage {
     this.mockNextPage = null;
   }
 
-  display(): IPage | null {
+  execute(): IPage | null {
     this.displayCallNum++;
 
     return this.mockNextPage;

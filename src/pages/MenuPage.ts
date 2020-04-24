@@ -39,14 +39,30 @@ export default class MenuPage implements IPage {
     };
   }
 
-  async display(): Promise<IPage | null> {
-    this.userIO.clear();
+  async execute(): Promise<IPage | null> {
+    this.printTitle();
 
+    const choices = this.createPromptChoices();
+    const answer = await this.getNextPage(choices);
+
+    return this.routePage(answer);
+  }
+
+  private printTitle() {
+    this.userIO.clear();
+  }
+
+  private createPromptChoices(): (string | Separator)[] {
     const exitChoices: (string | Separator)[] = [new Separator(), 'Exit'];
     let choices: (string | Separator)[] = Object.keys(this.nextPageOptions);
-    choices = choices.concat(exitChoices);
+    return choices.concat(exitChoices);
+  }
 
-    const answer: Answers = await this.prompter.promptList('Main menu:', choices);
+  private async getNextPage(choices: (string | Separator)[]): Promise<Answers> {
+    return await this.prompter.promptList('Main menu:', choices);
+  }
+
+  private routePage(answer: Answers): IPage | null {
     const action: string = answer.action;
 
     if (action === 'Exit') {

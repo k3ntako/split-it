@@ -46,13 +46,13 @@ describe('AddTransactionPage', () => {
   });
 
   it('should clear screen prior to each question', async () => {
-    await addTransactionPage.display();
+    await addTransactionPage.execute();
 
     expect(mockCLI.clearCallNum).to.equal(mockCLI.promptMockAnswers.length);
   });
 
   it('should display page title at top prior to each question', async () => {
-    await addTransactionPage.display();
+    await addTransactionPage.execute();
 
     const expectedTitle: string = chalk.bold('Add a Transaction\n');
 
@@ -61,7 +61,7 @@ describe('AddTransactionPage', () => {
   });
 
   it('should ask user who else was involved in the transaction', async () => {
-    await addTransactionPage.display();
+    await addTransactionPage.execute();
 
     const otherUserArg: IQuestionOptions = mockCLI.promptArguments[0];
     expect(otherUserArg.type).to.equal('list');
@@ -70,7 +70,7 @@ describe('AddTransactionPage', () => {
   });
 
   it('should ask user for the transaction name', async () => {
-    await addTransactionPage.display();
+    await addTransactionPage.execute();
 
     const nameArg: IQuestionOptions = mockCLI.promptArguments[1];
     expect(nameArg.type).to.equal('input');
@@ -78,7 +78,7 @@ describe('AddTransactionPage', () => {
   });
 
   it('should ask user for the transaction date', async () => {
-    await addTransactionPage.display();
+    await addTransactionPage.execute();
 
     const dateArg: IQuestionOptions = mockCLI.promptArguments[2];
     expect(dateArg.type).to.equal('datetime');
@@ -86,7 +86,7 @@ describe('AddTransactionPage', () => {
   });
 
   it('should ask user if they paid the transaction', async () => {
-    await addTransactionPage.display();
+    await addTransactionPage.execute();
 
     const confirmationArg: IQuestionOptions = mockCLI.promptArguments[3];
     expect(confirmationArg.message).to.equal('Did you pay for this?');
@@ -94,7 +94,7 @@ describe('AddTransactionPage', () => {
   });
 
   it('should ask user for the cost', async () => {
-    await addTransactionPage.display();
+    await addTransactionPage.execute();
 
     const costArg: IQuestionOptions = mockCLI.promptArguments[4];
     expect(costArg.message).to.equal('How much did it cost?');
@@ -119,7 +119,7 @@ describe('AddTransactionPage', () => {
         return { id: 0, name, cost, date };
       };
 
-      await addTransactionPage.display();
+      await addTransactionPage.execute();
     } catch (error) {
       throw error;
     } finally {
@@ -156,7 +156,7 @@ describe('AddTransactionPage', () => {
         return { id: 0, name, cost, date };
       };
 
-      await addTransactionPage.display();
+      await addTransactionPage.execute();
     } catch (error) {
       throw error;
     } finally {
@@ -193,7 +193,7 @@ describe('AddTransactionPage', () => {
         return { id: 0, name, cost, date };
       };
 
-      await addTransactionPage.display();
+      await addTransactionPage.execute();
 
       const expectedError = 'Invalid name, please try again!';
       const diplayErrorArgs = mockCLI.printArguments.filter((str) => str === expectedError);
@@ -235,7 +235,7 @@ describe('AddTransactionPage', () => {
         return { id: 0, name, cost, date };
       };
 
-      await addTransactionPage.display();
+      await addTransactionPage.execute();
 
       const expectedError = 'Invalid cost, please enter a positive number with at most two decimal places!';
       const diplayErrorArgs = mockCLI.printArguments.filter((str) => str === expectedError);
@@ -248,7 +248,7 @@ describe('AddTransactionPage', () => {
   });
 
   it('should return the MenuPage as the next page', async () => {
-    const nextPage = await addTransactionPage.display();
+    const nextPage = await addTransactionPage.execute();
     expect(nextPage).to.be.an.instanceOf(MenuPage);
   });
 });

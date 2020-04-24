@@ -4,11 +4,11 @@ import LoginPage from '../../src/pages/LoginPage';
 import MockCLI from './../mockClasses/mockCLI';
 
 describe('WelcomePage', () => {
-  describe('display', () => {
+  describe('execute', () => {
     it('should call print with welcome message', () => {
       const mockCLI: MockCLI = new MockCLI();
       const welcomePage = new WelcomePage(mockCLI);
-      welcomePage.display();
+      welcomePage.execute();
 
       expect(mockCLI.clearCallNum).to.be.at.least(1);
       expect(mockCLI.printArguments[0]).to.equal('Welcome to Split-it!');
@@ -17,7 +17,7 @@ describe('WelcomePage', () => {
     it('should return next page to display', () => {
       const mockCLI: MockCLI = new MockCLI();
       const welcomePage = new WelcomePage(mockCLI);
-      const nextPage = welcomePage.display();
+      const nextPage = welcomePage.execute();
 
       expect(nextPage).to.be.an.instanceOf(LoginPage);
     });

@@ -31,7 +31,7 @@ describe('LoginPage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const loginPage = new LoginPage(mockCLI, prompter);
-    await loginPage.display();
+    await loginPage.execute();
 
     const arg = mockCLI.promptArguments[0];
 
@@ -56,7 +56,7 @@ describe('LoginPage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const loginPage = new LoginPage(mockCLI, prompter);
-    const nextPage = await loginPage.display();
+    const nextPage = await loginPage.execute();
 
     expect(nextPage).to.be.an.instanceOf(SignUpPage);
   });
@@ -69,7 +69,7 @@ describe('LoginPage', () => {
     await userTable.create('Bjorn');
 
     const loginPage = new LoginPage(mockCLI, prompter);
-    await loginPage.display();
+    await loginPage.execute();
 
     const arg: IQuestionOptions = mockCLI.promptArguments[0];
     expect(arg.choices).to.include.members(['New Account', 'Bjorn']);
@@ -82,7 +82,7 @@ describe('LoginPage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const loginPage = new LoginPage(mockCLI, prompter);
-    const nextPage = await loginPage.display();
+    const nextPage = await loginPage.execute();
 
     expect(nextPage).to.be.an.instanceOf(MenuPage);
   });

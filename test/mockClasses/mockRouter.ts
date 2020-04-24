@@ -1,5 +1,5 @@
-import { IRouter } from "../../src/Router";
-import IPage from "../../src/pages/IPage";
+import { IRouter } from '../../src/Router';
+import IPage from '../../src/pages/IPage';
 
 export default class MockRouter implements IRouter {
   currentPage: IPage;
@@ -11,8 +11,8 @@ export default class MockRouter implements IRouter {
     this.navigateToCall = 0;
   }
 
-  async displayPages(): Promise<void>{
-    await this.currentPage.display();
+  async displayPages(): Promise<void> {
+    await this.currentPage.execute();
     this.startCallNum++;
   }
 }

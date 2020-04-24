@@ -44,7 +44,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.clearCallNum).to.equal(1);
     expect(mockCLI.printArguments[0]).to.equal(chalk.bold('Transactions\n'));
@@ -55,7 +55,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.printArguments[1]).to.include(chalk.green('$5.05'));
     expect(mockCLI.printArguments[2]).to.include(chalk.red('$10.10'));
@@ -69,7 +69,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.promptArguments).to.eql([
       {
@@ -86,7 +86,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    const nextPage = await viewBalancePage.display();
+    const nextPage = await viewBalancePage.execute();
 
     expect(nextPage).to.be.an.instanceOf(MenuPage);
   });
@@ -134,7 +134,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.printArguments).to.have.lengthOf(11); // prints title first
   });
@@ -144,7 +144,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.promptArguments).to.eql([
       {
@@ -162,7 +162,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.printArguments).to.have.lengthOf(14); // prints title twice
 
@@ -181,7 +181,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.promptArguments[1]).to.eql({
       type: 'list',
@@ -197,7 +197,7 @@ describe('ViewBalancePage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const viewBalancePage = new ViewTransactionPage(mockCLI, prompter, activeUser);
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     // 1 + 10 + 1 + 2 + 10
     // 1 = title, 10 = first page, 2 = second page

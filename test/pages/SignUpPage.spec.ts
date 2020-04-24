@@ -14,7 +14,7 @@ describe('SignUpPage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const loginPage = new SignUpPage(mockCLI, prompter);
-    await loginPage.display();
+    await loginPage.execute();
 
     expect(mockCLI.clearCallNum).to.equal(1);
 
@@ -39,7 +39,7 @@ describe('SignUpPage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const signUpPage = new SignUpPage(mockCLI, prompter);
-    await signUpPage.display();
+    await signUpPage.execute();
 
     const newValidName = await userTable.findByName('New Valid Name');
     expect(newValidName).to.exist;
@@ -52,7 +52,7 @@ describe('SignUpPage', () => {
     const prompter: IPrompter = new Prompter(mockCLI);
 
     const loginPage = new SignUpPage(mockCLI, prompter);
-    const nextPage = await loginPage.display();
+    const nextPage = await loginPage.execute();
 
     expect(nextPage).to.be.an.instanceOf(MenuPage);
   });

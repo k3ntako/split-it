@@ -48,7 +48,7 @@ describe('ViewBalancePage', () => {
       new BalanceCalculator(),
       new BalanceFormatter(),
     );
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.clearCallNum).to.equal(1);
     expect(mockCLI.printArguments[0]).to.equal(chalk.bold('Balance\n'));
@@ -65,7 +65,7 @@ describe('ViewBalancePage', () => {
       new BalanceCalculator(),
       new BalanceFormatter(),
     );
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.clearCallNum).to.equal(1);
     expect(mockCLI.printArguments).to.eql([
@@ -88,7 +88,7 @@ describe('ViewBalancePage', () => {
       new BalanceCalculator(),
       new BalanceFormatter(),
     );
-    await viewBalancePage.display();
+    await viewBalancePage.execute();
 
     expect(mockCLI.promptArguments).to.eql([
       {
@@ -113,7 +113,7 @@ describe('ViewBalancePage', () => {
       new BalanceFormatter(),
     );
 
-    const nextPage = await viewBalancePage.display();
+    const nextPage = await viewBalancePage.execute();
 
     expect(nextPage).to.instanceOf(MenuPage);
   });

@@ -10,10 +10,17 @@ export default class WelcomePage implements IPage {
     this.userIO = userIO;
   }
 
-  display(): IPage {
+  execute(): IPage {
+    this.printTitle();
+    return this.routePage();
+  }
+
+  private printTitle(): void {
     this.userIO.clear();
     this.userIO.print('Welcome to Split-it!');
+  }
 
+  private routePage() {
     return new LoginPage(this.userIO, new Prompter(this.userIO));
   }
 }

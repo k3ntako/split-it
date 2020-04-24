@@ -24,16 +24,28 @@ export default class ViewBalancePage implements IPage {
     this.page = 0;
   }
 
-  async display(): Promise<IPage> {
+  async execute(): Promise<IPage> {
+    this.printTitle();
+
+    const transactionsWithUsers = await this.getTransactionsWithUsers();
+
+    const promptChoices: (string | Separator)[] = await this.createPromptChoices(transactionsWithUsers);
+
+    const answer: Answers = await this.getNextPage(promptChoices);
+
+    return this.routePage(answer);
+  }
+
+  private async getTransactionsWithUsers(): Promise<ITransactionsWithUsers[]> {
+    return await transactionTable.getTransactionsWithUsers(this.user.id, 11, this.page * 10);
+  }
+
+  private printTitle() {
     this.userIO.clear();
     this.userIO.print(chalk.bold('Transactions\n'));
+  }
 
-    const transactionsWithUsers: ITransactionsWithUsers[] = await transactionTable.getTransactionsWithUsers(
-      this.user.id,
-      11,
-      this.page * 10,
-    );
-
+  private async createPromptChoices(transactionsWithUsers: ITransactionsWithUsers[]) {
     const hasMoreThanTen: boolean = transactionsWithUsers.length === 11;
     const firstTenTransactions: ITransactionsWithUsers[] = transactionsWithUsers.splice(0, 10);
 
@@ -52,14 +64,20 @@ export default class ViewBalancePage implements IPage {
       promptChoices.push('Previous page');
     }
 
-    const answer: Answers = await this.prompter.promptList('Select One', promptChoices);
+    return promptChoices;
+  }
 
+  private async getNextPage(promptChoices: (string | Separator)[]): Promise<Answers> {
+    return await this.prompter.promptList('Select One', promptChoices);
+  }
+
+  private routePage(answer: Answers) {
     if (answer.action === 'Next page') {
       this.page++;
-      return this.display();
+      return this.execute();
     } else if (answer.action === 'Previous page') {
       this.page--;
-      return this.display();
+      return this.execute();
     } else {
       return new MenuPage(this.userIO, this.prompter, this.user);
     }

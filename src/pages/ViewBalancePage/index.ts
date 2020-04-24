@@ -30,21 +30,48 @@ export default class ViewBalancePage implements IPage {
     this.balanceFormatter = balanceFormatter;
   }
 
-  async display() {
+  async execute() {
+    this.printTitle();
+
+    const transactionUsers: ITransactionUser[] = await this.getTransactionUser(this.user.id);
+    const balance = this.balanceCalculator.calculateBalance(transactionUsers, this.user);
+
+    const users: IUser[] = await this.getUsers();
+
+    const balanceMessages: string[] = this.formatBalanceStrings(balance, users);
+    this.printBalanceStrings(balanceMessages);
+
+    await this.getNextPage();
+    return this.routePage();
+  }
+
+  private printTitle() {
     this.userIO.clear();
     this.userIO.print(chalk.bold('Balance\n'));
+  }
 
-    const transactionUsers: ITransactionUser[] = await transactionTable.getTransactionUser(this.user.id);
-    const balance = this.balanceCalculator.calculateBalance(transactionUsers, this.user);
-    const users: IUser[] = await userTable.getAll();
+  private async getUsers(): Promise<IUser[]> {
+    return await userTable.getAll();
+  }
 
-    const balanceMessages = this.balanceFormatter.formatForPrint(balance, users);
+  private formatBalanceStrings(balance: Record<string, number>, users: IUser[]): string[] {
+    return this.balanceFormatter.formatForPrint(balance, users);
+  }
+
+  private printBalanceStrings(balanceMessages: string[]): void {
     balanceMessages.forEach((str) => this.userIO.print(str));
-
     this.userIO.print('\n');
+  }
 
+  private async getTransactionUser(id: number): Promise<ITransactionUser[]> {
+    return await transactionTable.getTransactionUser(id);
+  }
+
+  private async getNextPage(): Promise<void> {
     await this.prompter.promptList('Enter to return', ['Return to menu']);
+  }
 
+  private routePage(): IPage {
     return new MenuPage(this.userIO, this.prompter, this.user);
   }
 }

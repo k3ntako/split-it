@@ -1,4 +1,4 @@
-import IPage from "./pages/IPage";
+import IPage from './pages/IPage';
 
 export interface IRouter {
   currentPage: IPage | null;
@@ -8,13 +8,13 @@ export interface IRouter {
 export default class Router implements IRouter {
   currentPage: IPage | null;
 
-  constructor(intialPage: IPage){
+  constructor(intialPage: IPage) {
     this.currentPage = intialPage;
   }
 
-  async displayPages(){
+  async displayPages() {
     while (this.currentPage) {
-      const nextPage = await this.currentPage.display();
+      const nextPage = await this.currentPage.execute();
       this.currentPage = nextPage;
     }
   }
